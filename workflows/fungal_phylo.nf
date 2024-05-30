@@ -60,7 +60,8 @@ if (params.help) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { COMBINE_LANES                              } from '../modules/combine_lanes'
+include { COMBINE_LANES                             } from '../modules/combine_lanes'
+include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
 
 // utility processes for development and debugging
 include { STOP                                      } from '../modules/stop'
@@ -112,6 +113,8 @@ workflow FUNGAL_PHYLO {
     /// NOTE: Input reads need to be in the ./data directory for the code to work at the moment
     COMBINE_LANES ( ch_input )
 
+    //// trim adapters, filter contaminants, merge pairs
+    READ_PREPROCESSING ( COMBINE_LANES.out.reads )
 
 
 }

@@ -1,13 +1,14 @@
-process COMBINE_LANES {
-    def module_name = "combine_lanes"
+process READ_PREPROCESSING {
+    def module_name = "read_preprocessing"
     tag "$sample"
     // label:  
+    cpus 8
 
     input:
-    tuple val(sample), val(fwd_reads), val(rev_reads)
+    tuple val(sample), path(fwd_reads), path(rev_reads)
 
     output:   
-    tuple val(sample), path("*_R1.fastq.gz"), path("*_R2.fastq.gz"),          emit: reads
+    path("*.fastq.gz")
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 
