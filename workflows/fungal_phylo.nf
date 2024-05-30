@@ -1,3 +1,15 @@
+
+/*
+
+TODO:
+    - make parameter validation schema
+    - make samplesheet validation schema
+    - 
+
+*/
+
+
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     PRINT PARAMS SUMMARY
@@ -26,7 +38,17 @@ if (params.help) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-//// Inputs
+/* Inputs and parameters
+    Per sample/genome:
+        - .fastq input reads (more than one pair)
+            - OR accession in repository like NCBI
+        - metadata for every genome (required: name, )
+    Per pipeline run:
+        - Taxonomic group to restrict phylogeny to
+        - .fasta files or pHMM of multilocus regions to extract
+        - 
+
+*/
 
 
 
@@ -51,5 +73,24 @@ include { STOP                                      } from '../modules/stop'
 */
 
 workflow FUNGAL_PHYLO {
+
+    /*
+    General ideas for workflow:
+        1. Trim adapters
+        2. Remove low-quality bases and/or SPAdes error correction
+        3. Pull read length from .fastq and set appropriate k-mer sizes
+        4. Run SPAdes assembly
+        5. QUAST assessment
+        6. Annotation of assembly using related species (Augustus? Other programs?)
+        7. BUSCO for completeness
+        8. Metabolite prediction using antiSMASH
+        9. Pull specific loci from genome for multi-locus phylogeny
+        10. Analyse key pathogenicity genes in terms of presence/absence, copy-number etc. 
+        11. Use UFCG to run phylogenomics across all samples
+        12. Across all genomes, run phylogenetic estimation using multi-loci data and phylogenomic data
+
+    */
+
+
 
 }
