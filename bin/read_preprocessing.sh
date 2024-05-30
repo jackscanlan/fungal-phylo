@@ -26,15 +26,15 @@ module load BBMap/38.98-GCC-11.2.0
 bbmerge.sh \
     in=$3 \
     in2=$4 \
-    outa=adapters.fa
+    outa=${2}_adapters.fa
 
 # adapter trimming (BBDuk)
 bbduk.sh \
     in=$3 \
     in2=$4 \
-    out=at_R1.fastq.gz \
-    out2=at_R2.fastq.gz \
-    ref=adapters.fa \
+    out=${2}_at_R1.fastq.gz \
+    out2=${2}_at_R2.fastq.gz \
+    ref=${2}_adapters.fa \
     ktrim=r \
     k=23 \
     mink=11 \
@@ -44,10 +44,10 @@ bbduk.sh \
 
 # contaminant filtering
 bbduk.sh \
-    in=at_R1.fastq.gz \
-    in2=at_R2.fastq.gz \
-    out=cf_R1.fastq.gz \
-    out2=cf_fastq.gz \
+    in=${2}_at_R1.fastq.gz \
+    in2=${2}_at_R2.fastq.gz \
+    out=${2}_cf_R1.fastq.gz \
+    out2=${2}_cf_R2.fastq.gz \
     outm=phiX_match.fastq.gz \
     ref=${1}/assets/phiX.fasta \
     k=31 \
@@ -55,11 +55,8 @@ bbduk.sh \
 
 # paired-read merging
 bbmerge.sh \
-    in=reads.fq \
-    in2= \
-    out=merged.fastq.gz \
-    outu=unmerged_R1.fastq.gz \
-    outu2=unmerged \
-    ihist=ihist.txt
-
-exit 1
+    in=${2}_cf_R1.fastq.gz \
+    in2=${2}_cf_R2.fastq.gz \
+    out=${2}_merged.fastq.gz \
+    outu=${2}_unmerged_R1.fastq.gz \
+    outu2=${2}_unmerged_R2.fastq.gz 

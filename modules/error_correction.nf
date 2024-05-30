@@ -1,14 +1,14 @@
-process READ_PREPROCESSING {
-    def module_name = "read_preprocessing"
+process ERROR_CORRECTION {
+    def module_name = "error_correction"
     tag "$sample"
     // label:  
     cpus 16
 
     input:
-    tuple val(sample), path(fwd_reads), path(rev_reads)
+    tuple val(sample), path(fwd_reads), path(rev_reads), path(merged_reads)
 
     output:   
-    tuple val(sample), path("*_unmerged_R1.fastq.gz"), path("*_unmerged_R2.fastq.gz"), path("*_merged.fastq.gz"), emit: reads
+
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 
@@ -24,7 +24,8 @@ process READ_PREPROCESSING {
         ${projectDir} \
         ${sample} \
         ${fwd_reads} \
-        ${rev_reads} 
+        ${rev_reads} \
+        ${merged_reads}
     
     """
 

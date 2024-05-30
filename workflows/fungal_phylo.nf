@@ -62,6 +62,8 @@ if (params.help) {
 
 include { COMBINE_LANES                             } from '../modules/combine_lanes'
 include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
+include { ERROR_CORRECTION                        } from '../modules/error_correction'
+
 
 // utility processes for development and debugging
 include { STOP                                      } from '../modules/stop'
@@ -115,6 +117,9 @@ workflow FUNGAL_PHYLO {
 
     //// trim adapters, filter contaminants, merge pairs
     READ_PREPROCESSING ( COMBINE_LANES.out.reads )
+
+    //// correct errors in reads using SPAdes
+    ERROR_CORRECTION ( READ_PREPROCESSING.out.reads )
 
 
 }
