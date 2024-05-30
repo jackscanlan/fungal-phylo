@@ -59,4 +59,5 @@ bbmerge.sh \
     in2=${2}_cf_R2.fastq.gz \
     out=${2}_merged.fastq.gz \
     outu=${2}_unmerged_R1.fastq.gz \
-    outu2=${2}_unmerged_R2.fastq.gz 
+    outu2=${2}_unmerged_R2.fastq.gz \
+    vstrict

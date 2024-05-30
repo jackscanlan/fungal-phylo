@@ -17,7 +17,7 @@ spades.py \
     -1 $3 \
     -2 $4 \
     -s $5 \
-    --threads 24 \
+    --threads 16 \
     --memory 480 \
     --only-error-correction \
     -o .
