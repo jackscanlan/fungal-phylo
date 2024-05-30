@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+data/
+work/
+trace/
+output/
+*.log
+.nextflow/
+*.log.[0-9]
