@@ -5,6 +5,7 @@
 data/
 work/
 trace/
+input/
 output/
 *.log
 .nextflow/

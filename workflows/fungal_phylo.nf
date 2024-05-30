@@ -21,7 +21,7 @@ include { validateParameters; paramsHelp; paramsSummaryLog; samplesheetToList } 
 
 // Print help message, supply typical command line usage for the pipeline
 if (params.help) {
-   log.info paramsHelp("nextflow run . --samplesheet samplesheet.csv --loci_params loci_params.csv") // TODO: add typical commands for pipeline
+   log.info paramsHelp("nextflow run . --samplesheet samplesheet.csv") // TODO: add typical commands for pipeline
    exit 0
 }
 
@@ -60,7 +60,7 @@ if (params.help) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { PARSE_INPUTS                              } from '../modules/parse_inputs'
+include { COMBINE_LANES                              } from '../modules/combine_lanes'
 
 // utility processes for development and debugging
 include { STOP                                      } from '../modules/stop'
@@ -76,20 +76,41 @@ workflow FUNGAL_PHYLO {
 
     /*
     General ideas for workflow:
-        1. Trim adapters
-        2. Remove low-quality bases and/or SPAdes error correction
-        3. Pull read length from .fastq and set appropriate k-mer sizes
-        4. Run SPAdes assembly
-        5. QUAST assessment
-        6. Annotation of assembly using related species (Augustus? Other programs?)
-        7. BUSCO for completeness
-        8. Metabolite prediction using antiSMASH
-        9. Pull specific loci from genome for multi-locus phylogeny
-        10. Analyse key pathogenicity genes in terms of presence/absence, copy-number etc. 
-        11. Use UFCG to run phylogenomics across all samples
-        12. Across all genomes, run phylogenetic estimation using multi-loci data and phylogenomic data
+        - combine .fastq from different lanes, if necessary
+        - Detect adapters with overlapping reads or known adapters using BBDuk
+            - tbo and tpe flags
+        - 
+        - Trim adapters and merge overlapping reads
+        - Remove low-quality bases and/or SPAdes error correction
+        - Run SPAdes assembly (make sure kmer sizes are appropriate)
+        - QUAST assessment
+        - Annotation of assembly using related species (Augustus? Other programs?)
+        - BUSCO for completeness
+        - Metabolite prediction using antiSMASH
+        - Pull specific loci from genome for multi-locus phylogeny
+        - Analyse key pathogenicity genes in terms of presence/absence, copy-number etc. 
+        - Use UFCG to run phylogenomics across all samples
+        - Across all genomes, run phylogenetic estimation using multi-loci data and phylogenomic data
 
     */
+
+    Channel.fromPath(params.samplesheet)
+        .splitCsv ( header: true )
+        .map { row ->
+            // concatenate all values from columns starting with 'fwd' into a string delimited by commas
+            def fwd_reads = row.findAll { it.key.startsWith('fwd') } .values() .join(",") 
+            // concatenate all values from columns starting with 'rev' into a string delimited by commas
+            def rev_reads = row.findAll { it.key.startsWith('rev') } .values() .join(",")
+            // output tuple
+            [ row.sample, fwd_reads, rev_reads ]
+            }
+        .set { ch_input }
+
+    // ch_input.view()
+
+    //// if input reads are split across lanes, combine fwd and rev into 
+    /// NOTE: Input reads need to be in the ./data directory for the code to work at the moment
+    COMBINE_LANES ( ch_input )
 
 
 
