@@ -128,16 +128,10 @@ workflow FUNGAL_PHYLO {
     //// assembly genomes using SPAdes
     ASSEMBLY ( ERROR_CORRECTION.out.reads )
 
-    /*
-    For QUAST input, need:
-    - output scaffolds from ASSEMBLY
-    - 
-    */
-
+    //// join error-corrected reads with the assembly scaffolds
     ERROR_CORRECTION.out.reads 
         .join ( ASSEMBLY.out.scaffolds, by: 0 )
         .set { ch_quast_input } 
-
 
     //// assess assembly quality
     QUAST ( ch_quast_input )
