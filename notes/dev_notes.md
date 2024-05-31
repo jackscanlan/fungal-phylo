@@ -14,3 +14,5 @@ Running with test data:
     module load Java/17.0.6
     # run nextflow
     nextflow run . -resume --samplesheet input/samplesheet_test.csv
+
+Running on EPFG1 (~2.3GB of combined data), takes ~1 hour to get to the end of ERROR_CORRECTION

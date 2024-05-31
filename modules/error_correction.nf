@@ -8,6 +8,7 @@ process ERROR_CORRECTION {
     tuple val(sample), path(fwd_reads), path(rev_reads), path(merged_reads)
 
     output:   
+    tuple val(sample), path("*R1.fastq.00.0_0.cor.fastq.gz"), path("*R2.fastq.00.0_0.cor.fastq.gz"), path("*single.cor.fastq.gz"), emit: reads
 
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
