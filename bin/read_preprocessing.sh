@@ -61,3 +61,10 @@ bbmerge.sh \
     outu=${2}_unmerged_R1.fastq.gz \
     outu2=${2}_unmerged_R2.fastq.gz \
     vstrict
+
+# if merged file is not created due to no pairs merging, create empty file for output
+if [ -f ${2}_merged.fastq.gz ]; then
+    echo "Not creating '${2}_merged.fastq.gz' as already exists."
+else
+    touch ${2}_merged.fastq.gz
+fi

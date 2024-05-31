@@ -10,7 +10,7 @@ Running with test data:
 
     # load cpus
     sinteractive -c16
-    # load modules
+    # load modules (Nextflow installed locally)
     module load Java/17.0.6
     # run nextflow
-    nextflow run . --samplesheet input/samplesheet_test.csv
+    nextflow run . -resume --samplesheet input/samplesheet_test.csv

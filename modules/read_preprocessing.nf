@@ -27,5 +27,5 @@ process READ_PREPROCESSING {
         ${rev_reads} 
     
     """
-
+    /// TODO: handle when no merged reads
 }

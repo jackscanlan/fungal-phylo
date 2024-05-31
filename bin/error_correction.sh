@@ -13,11 +13,24 @@ set -u
 
 module load SPAdes/3.15.5-GCC-12.3.0
 
-spades.py \
-    -1 $3 \
-    -2 $4 \
-    -s $5 \
-    --threads 16 \
-    --memory 480 \
-    --only-error-correction \
-    -o .
+## only use merged reads if they exist
+if [[ -z $(grep '[^[:space:]]' $5) ]]; then
+    # merged reads file is empty or contains only whitespace
+    spades.py \
+        -1 $3 \
+        -2 $4 \
+        --threads 16 \
+        --memory 480 \
+        --only-error-correction \
+        -o .
+else 
+    # merged reads file is not empty
+    spades.py \
+        -1 $3 \
+        -2 $4 \
+        -s $5 \
+        --threads 16 \
+        --memory 480 \
+        --only-error-correction \
+        -o .
+fi 
