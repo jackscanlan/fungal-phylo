@@ -63,6 +63,8 @@ if (params.help) {
 include { COMBINE_LANES                             } from '../modules/combine_lanes'
 include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
 include { ERROR_CORRECTION                        } from '../modules/error_correction'
+include { ASSEMBLY                        } from '../modules/assembly'
+
 
 
 // utility processes for development and debugging
@@ -100,9 +102,9 @@ workflow FUNGAL_PHYLO {
     Channel.fromPath(params.samplesheet)
         .splitCsv ( header: true )
         .map { row ->
-            // concatenate all values from columns starting with 'fwd' into a string delimited by commas
+            // concatenate all values from columns/keys starting with 'fwd' into a string delimited by commas
             def fwd_reads = row.findAll { it.key.startsWith('fwd') } .values() .join(",") 
-            // concatenate all values from columns starting with 'rev' into a string delimited by commas
+            // concatenate all values from columns/keys starting with 'rev' into a string delimited by commas
             def rev_reads = row.findAll { it.key.startsWith('rev') } .values() .join(",")
             // output tuple
             [ row.sample, fwd_reads, rev_reads ]
@@ -121,5 +123,7 @@ workflow FUNGAL_PHYLO {
     //// correct errors in reads using SPAdes
     ERROR_CORRECTION ( READ_PREPROCESSING.out.reads )
 
-    ERROR_CORRECTION.out.reads.view()
+    //// assembly genomes using SPAdes
+    ASSEMBLY ( ERROR_CORRECTION.out.reads )
+
 }

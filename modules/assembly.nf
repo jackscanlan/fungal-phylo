@@ -1,14 +1,16 @@
-process READ_PREPROCESSING {
-    def module_name = "read_preprocessing"
+process ASSEMBLY {
+    def module_name = "assembly"
     tag "$sample"
     // label:  
     cpus 32
+    cache false 
 
     input:
-    tuple val(sample), path(fwd_reads), path(rev_reads)
+    tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads)
 
-    output:   
-    tuple val(sample), path("*_unmerged_R1.fastq.gz"), path("*_unmerged_R2.fastq.gz"), path("*_merged.fastq.gz"), emit: reads
+    output:
+    tuple val(sample), path("*_scaffolds.fasta"),       emit: scaffolds
+    tuple val(sample), path("*_assembly.log"),          emit: log
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 
@@ -24,8 +26,10 @@ process READ_PREPROCESSING {
         ${projectDir} \
         ${sample} \
         ${fwd_reads} \
-        ${rev_reads} 
+        ${rev_reads} \
+        ${unpaired_reads} \
+        ${task.cpus}
     
     """
-    /// TODO: handle when no merged reads
+
 }

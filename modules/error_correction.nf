@@ -2,13 +2,13 @@ process ERROR_CORRECTION {
     def module_name = "error_correction"
     tag "$sample"
     // label:  
-    cpus 16
+    cpus 32
 
     input:
     tuple val(sample), path(fwd_reads), path(rev_reads), path(merged_reads)
 
     output:   
-    tuple val(sample), path("*R1.fastq.00.0_0.cor.fastq.gz"), path("*R2.fastq.00.0_0.cor.fastq.gz"), path("*single.cor.fastq.gz"), emit: reads
+    tuple val(sample), path("*_R1.cor.fastq.gz"), path("*_R2.cor.fastq.gz"), path("*single.cor.fastq.gz"), emit: reads
 
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
@@ -26,7 +26,8 @@ process ERROR_CORRECTION {
         ${sample} \
         ${fwd_reads} \
         ${rev_reads} \
-        ${merged_reads}
+        ${merged_reads} \
+        ${task.cpus}
     
     """
 

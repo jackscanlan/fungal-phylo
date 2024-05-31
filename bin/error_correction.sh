@@ -7,7 +7,7 @@ set -u
 # $3 = fwd_reads (.fastq.gz)
 # $4 = rev_reads (.fastq.gz)
 # $5 = merged_reads (.fastq.gz)
-# $6 = 
+# $6 = threads 
 # $7 = 
 # $8 = 
 
@@ -19,7 +19,7 @@ if [[ -z $(grep '[^[:space:]]' $5) ]]; then
     spades.py \
         -1 $3 \
         -2 $4 \
-        --threads 16 \
+        --threads $6 \
         --memory 480 \
         --only-error-correction \
         -o .
@@ -29,7 +29,7 @@ else
         -1 $3 \
         -2 $4 \
         -s $5 \
-        --threads 16 \
+        --threads $6 \
         --memory 480 \
         --only-error-correction \
         -o .
@@ -61,6 +61,9 @@ else
     exit 1
 fi
 
+# copy and rename paired output files
+cp ./corrected/${2}_unmerged_R1.fastq.00.0_0.cor.fastq.gz ${2}_R1.cor.fastq.gz 
+cp ./corrected/${2}_unmerged_R2.fastq.00.0_0.cor.fastq.gz ${2}_R2.cor.fastq.gz 
 
 
 
