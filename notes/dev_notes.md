@@ -32,7 +32,10 @@ Timing:
     - If paired reads become unpaired due to rejection of one end, these get combined with the merged reads, if present, to produce a single 'single-end' .fastq for assembly
     - Tools used: `SPAdes`
 - `ASSEMBLY` assembles a genome *de novo* (`--only-assembler`)
-    - Should I try `--careful` mode?
+    - Uses `--careful` mode to polish scaffolds
+    - Tools used: `SPAdes`
+- `QUAST` assesses the quality of the genome assembly, optionally with a reference genome
+    - Not sure the best genomes to use for most purposes, so ue of reference is not implemented yet
 
 ### Samplesheet notes
 

@@ -62,8 +62,10 @@ if (params.help) {
 
 include { COMBINE_LANES                             } from '../modules/combine_lanes'
 include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
-include { ERROR_CORRECTION                        } from '../modules/error_correction'
-include { ASSEMBLY                        } from '../modules/assembly'
+include { ERROR_CORRECTION                          } from '../modules/error_correction'
+include { ASSEMBLY                                  } from '../modules/assembly'
+include { QUAST                                     } from '../modules/quast'
+
 
 
 
@@ -125,5 +127,19 @@ workflow FUNGAL_PHYLO {
 
     //// assembly genomes using SPAdes
     ASSEMBLY ( ERROR_CORRECTION.out.reads )
+
+    /*
+    For QUAST input, need:
+    - output scaffolds from ASSEMBLY
+    - 
+    */
+
+    ERROR_CORRECTION.out.reads 
+        .join ( ASSEMBLY.out.scaffolds, by: 0 )
+        .set { ch_quast_input } 
+
+
+    //// assess assembly quality
+    QUAST ( ch_quast_input )
 
 }

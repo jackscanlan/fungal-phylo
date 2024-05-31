@@ -1,11 +1,11 @@
-process ASSEMBLY {
-    def module_name = "assembly"
+process QUAST {
+    def module_name = "quast"
     tag "$sample"
     // label:  
-    cpus 32
+    cpus 4
 
     input:
-    tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads)
+    tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads), path(scaffolds)
 
     output:
     tuple val(sample), path("*_scaffolds.fasta"),       emit: scaffolds
@@ -27,6 +27,7 @@ process ASSEMBLY {
         ${fwd_reads} \
         ${rev_reads} \
         ${unpaired_reads} \
+        ${scaffolds} \
         ${task.cpus}
     
     """
