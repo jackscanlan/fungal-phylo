@@ -121,5 +121,5 @@ workflow FUNGAL_PHYLO {
     //// correct errors in reads using SPAdes
     ERROR_CORRECTION ( READ_PREPROCESSING.out.reads )
 
-
+    ERROR_CORRECTION.out.reads.view()
 }
