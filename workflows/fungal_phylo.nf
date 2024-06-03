@@ -65,6 +65,8 @@ include { READ_PREPROCESSING                        } from '../modules/read_prep
 include { ERROR_CORRECTION                          } from '../modules/error_correction'
 include { ASSEMBLY                                  } from '../modules/assembly'
 include { QUAST                                     } from '../modules/quast'
+include { UFCG_PROFILE                                     } from '../modules/ufcg_profile'
+
 
 
 
@@ -86,7 +88,6 @@ workflow FUNGAL_PHYLO {
         - combine .fastq from different lanes, if necessary
         - Detect adapters with overlapping reads or known adapters using BBDuk
             - tbo and tpe flags
-        - 
         - Trim adapters and merge overlapping reads
         - Remove low-quality bases and/or SPAdes error correction
         - Run SPAdes assembly (make sure kmer sizes are appropriate)
@@ -150,13 +151,38 @@ workflow FUNGAL_PHYLO {
     //// assess assembly quality
     QUAST ( ch_quast_input )
 
+    /* NOTE: Need a process that downloads assemblies from NCBI using accessions from samplesheet
+    - use entrezdirect/13.1.20200107-GCCcore-8.2.0 in BASC
+    */
 
 
+    ch_quast_input
+        .map { sample, fwd_reads, rev_reads, unpaired_reads, scaffolds ->
+             [ sample, scaffolds ] }
+        .set { ch_ufcg_profile_input}
+
+    /* 
+    NOTE: UFCG_PROFILE requires all assemblies be placed in a single directory, ideally with a metadata .tsv containing the following:
+    - 'Filename': name of the .fasta of the assembly
+    - 'Label': ID of the strain etc. 
+    - 'Accession': NCBI accession code for the assembly (make this 'NA' for new assemblies)
+    
+    This .tsv file is specified with '-m' on the command line.
+    If .tsv metadata is not provided, I think it assumes all the files in the directory it is pointed to are .fasta and will try to extract profiles.
+    */
 
     //// make UFCG profile from single genome assembly
-    // UFCG_PROFILE (  )
+    UFCG_PROFILE ( ch_ufcg_profile_input )
 
     //// make phylogeny from UFCG profiles
     // UFCG_TREE (  )
+    /* 
+    Use BUSCO sequences, core sequences or rDNA sequences?
+    */
+
+    //// process that converts UFCG profiles into .fasta (using )
+
+
+    //// process that uses ufcg train to build a sequence model of the genes we want to use for the multilocus phylogeny 
 
 }

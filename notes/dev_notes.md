@@ -36,6 +36,7 @@ Timing:
     - Tools used: `SPAdes`
 - `QUAST` assesses the quality of the genome assembly, optionally with a reference genome
     - Not sure the best genomes to use for most purposes, so ue of reference is not implemented yet
+- `UFCG_PROFILE` runs `ufcg profile` using container on a single sample, pulling out default core genes
 
 ### Samplesheet notes
 
