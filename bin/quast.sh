@@ -36,3 +36,8 @@ else
         --min-contig 100 \
         --split-scaffolds
 fi 
+
+
+### rename output files with unique names
+cp transposed_report.tsv ${2}_report.tsv
+cp basic_stats/Nx_plot.pdf ${2}_Nx_plot.pdf 

@@ -2,14 +2,14 @@ process QUAST {
     def module_name = "quast"
     tag "$sample"
     // label:  
-    cpus 4
+    cpus 32
 
     input:
     tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads), path(scaffolds)
 
     output:
-    tuple val(sample), path("*_scaffolds.fasta"),       emit: scaffolds
-    tuple val(sample), path("*_assembly.log"),          emit: log
+    tuple val(sample), path("${sample}_report.tsv"), emit: report_tsv
+    tuple val(sample), path("${sample}_Nx_plot.pdf"), emit: nx_plot
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

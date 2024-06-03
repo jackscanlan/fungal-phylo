@@ -28,6 +28,8 @@ bbmerge.sh \
     in2=$4 \
     outa=${2}_adapters.fa
 
+### TODO: handle case where adapters file is empty (ie. no adapters are found due to lack of overlaps)
+
 # adapter trimming (BBDuk)
 bbduk.sh \
     in=$3 \

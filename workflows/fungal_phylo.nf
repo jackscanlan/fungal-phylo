@@ -91,12 +91,19 @@ workflow FUNGAL_PHYLO {
         - Remove low-quality bases and/or SPAdes error correction
         - Run SPAdes assembly (make sure kmer sizes are appropriate)
         - QUAST assessment
-        - Annotation of assembly using related species (Augustus? Other programs?)
-        - BUSCO for completeness
-        - Metabolite prediction using antiSMASH
+        - Annotation of assembly using related species 
+            - use BRAKER (which contains AUGUSTUS): https://github.com/Gaius-Augustus/BRAKER 
+                - Docker container: https://hub.docker.com/r/teambraker/braker3 
+                - "Users have reported that you need to manually copy the AUGUSTUS_CONFIG_PATH contents to a writable location before running our containers from Nextflow. 
+                    Afterwards, you need to specify the writable AUGUSTUS_CONFIG_PATH as command line argument to BRAKER in Nextflow."
+            - alternatively use funannotate, which is installed in BASC: https://github.com/nextgenusfs/funannotate
+                - this also has tools for cleaning and renaming scaffolds: https://funannotate.readthedocs.io/en/latest/prepare.html 
+                - use redmask for repeat masking, installed in BASC: redmask/ac36368-foss-2019a-Python-3.7.2 
+        - BUSCO for completeness (can interact with funannotate, I think)
+        - Metabolite prediction using antiSMASH (can interact with funannotate, I think)
         - Pull specific loci from genome for multi-locus phylogeny
         - Analyse key pathogenicity genes in terms of presence/absence, copy-number etc. 
-        - Use UFCG to run phylogenomics across all samples
+        - Use UFCG to run phylogenomics across all samples (using container)
         - Across all genomes, run phylogenetic estimation using multi-loci data and phylogenomic data
 
     */
@@ -112,6 +119,13 @@ workflow FUNGAL_PHYLO {
             [ row.sample, fwd_reads, rev_reads ]
             }
         .set { ch_input }
+
+    /* TODO: '.branch' samplesheet channel into: 
+    - 'reads': raw sequencing reads (.fastq files)
+    - 'assembly': existing unannotated assemblies (.fasta or NCBI accession)
+    - 'complete': annotated, assembled genomes with NCBI accession (NCBI accession)
+    
+    */
 
     // ch_input.view()
 
@@ -135,5 +149,14 @@ workflow FUNGAL_PHYLO {
 
     //// assess assembly quality
     QUAST ( ch_quast_input )
+
+
+
+
+    //// make UFCG profile from single genome assembly
+    // UFCG_PROFILE (  )
+
+    //// make phylogeny from UFCG profiles
+    // UFCG_TREE (  )
 
 }
