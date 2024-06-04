@@ -50,6 +50,11 @@ Timing:
     - Not sure the best genomes to use for most purposes, so ue of reference is not implemented yet
 - `UFCG_PROFILE` runs `ufcg profile` using container on a single sample, pulling out default core genes
 
+### To-add
+
+- `CLEAN_ASSEMBLY` to clean assemblies of duplicated scaffolds/contigs, and rename sequences, using `funannotate`
+
+
 ### Samplesheet notes
 
 Workflow Groovy code currently parses the samplesheet like so:

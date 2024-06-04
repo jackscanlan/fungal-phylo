@@ -64,10 +64,9 @@ include { COMBINE_LANES                             } from '../modules/combine_l
 include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
 include { ERROR_CORRECTION                          } from '../modules/error_correction'
 include { ASSEMBLY                                  } from '../modules/assembly'
+include { CLEAN_ASSEMBLY                                  } from '../modules/clean_assembly'
 include { QUAST                                     } from '../modules/quast'
 include { UFCG_PROFILE                                     } from '../modules/ufcg_profile'
-
-
 
 
 
@@ -143,9 +142,12 @@ workflow FUNGAL_PHYLO {
     //// assembly genomes using SPAdes
     ASSEMBLY ( ERROR_CORRECTION.out.reads )
 
+    /// remove short, duplicated scaffolds and rename
+    CLEAN_ASSEMBLY ( ASSEMBLY.out.scaffolds )
+
     //// join error-corrected reads with the assembly scaffolds
     ERROR_CORRECTION.out.reads 
-        .join ( ASSEMBLY.out.scaffolds, by: 0 )
+        .join ( CLEAN_ASSEMBLY.out.scaffolds, by: 0 )
         .set { ch_quast_input } 
 
     //// assess assembly quality
@@ -159,7 +161,7 @@ workflow FUNGAL_PHYLO {
     ch_quast_input
         .map { sample, fwd_reads, rev_reads, unpaired_reads, scaffolds ->
              [ sample, scaffolds ] }
-        .set { ch_ufcg_profile_input}
+        .set { ch_ufcg_profile_input }
 
     /* 
     NOTE: UFCG_PROFILE requires all assemblies be placed in a single directory, ideally with a metadata .tsv containing the following:
