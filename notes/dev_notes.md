@@ -46,13 +46,27 @@ Timing:
 - `ASSEMBLY` assembles a genome *de novo* (`--only-assembler`)
     - Uses `--careful` mode to polish scaffolds
     - Tools used: `SPAdes`
+- `CLEAN_ASSEMBLY` to clean assemblies of duplicated scaffolds/contigs, and rename sequences
+    - Starting from the shortest scaffold, removes a scaffold if >=99% of the length has >=99% identity to a larger scaffold. Removes all scaffolds <500bp in length
+    - Renames all scaffolds to the form "scaffold_1", starting with the longest scaffold
+    - Tools used: `funannotate`
 - `QUAST` assesses the quality of the genome assembly, optionally with a reference genome
     - Not sure the best genomes to use for most purposes, so ue of reference is not implemented yet
+    - TODO: remove to  `QUAST_NEW` as it only gets used for new genomes
 - `UFCG_PROFILE` runs `ufcg profile` using container on a single sample, pulling out default core genes
 
 ### To-add
 
-- `CLEAN_ASSEMBLY` to clean assemblies of duplicated scaffolds/contigs, and rename sequences, using `funannotate`
+
+- `FIND_ASSEMBLIES` finds genome assembly accessions in NCBI within a specified taxonomic group
+- `RETRIEVE_ASSEMBLIES` retrieves genome assemblies from NCBI based on a list of accessions
+    - Tools used: `entrezdirect` (`entrezdirect/13.1.20200107-GCCcore-8.2.0` in BASC)
+        - or use official NCBI Docker image: https://github.com/ncbi/docker/tree/master/edirect 
+- `UFCG_METADATA` creates a .tsv file of metadata for the UFCG pipeline
+    - Tools used: probably just `bash` 
+- `QUAST_SUPPLIED` runs `quast` on genomes that were not assembled using this pipeline
+- `ASSEMBLY_VIZ` uses outputs from `quast` processes to produce plots comparing the contiguity and quality of your new genomes and your supplied genomes
+
 
 
 ### Samplesheet notes

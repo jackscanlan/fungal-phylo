@@ -145,18 +145,13 @@ workflow FUNGAL_PHYLO {
     /// remove short, duplicated scaffolds and rename
     CLEAN_ASSEMBLY ( ASSEMBLY.out.scaffolds )
 
-    //// join error-corrected reads with the assembly scaffolds
+    //// join error-corrected reads with the cleaned assembly scaffolds
     ERROR_CORRECTION.out.reads 
         .join ( CLEAN_ASSEMBLY.out.scaffolds, by: 0 )
         .set { ch_quast_input } 
 
     //// assess assembly quality
     QUAST ( ch_quast_input )
-
-    /* NOTE: Need a process that downloads assemblies from NCBI using accessions from samplesheet
-    - use entrezdirect/13.1.20200107-GCCcore-8.2.0 in BASC
-    */
-
 
     ch_quast_input
         .map { sample, fwd_reads, rev_reads, unpaired_reads, scaffolds ->
