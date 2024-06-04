@@ -174,6 +174,10 @@ workflow FUNGAL_PHYLO {
     //// make UFCG profile from single genome assembly
     UFCG_PROFILE ( ch_ufcg_profile_input )
 
+    //// combine .ucg profile files into a single channel
+    // UFCG_PROFILE.out.ucg
+    //     .
+
     //// make phylogeny from UFCG profiles
     // UFCG_TREE (  )
     /* 

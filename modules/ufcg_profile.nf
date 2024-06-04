@@ -9,7 +9,7 @@ process UFCG_PROFILE {
     tuple val(sample), path(scaffolds)
 
     output:
-
+    tuple val(sample), path("${sample}.ucg"), emit: ucg
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

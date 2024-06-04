@@ -15,6 +15,18 @@ Running with test data:
     # run nextflow
     nextflow run . -resume --samplesheet input/samplesheet_test.csv
 
+    ## testing ufcg
+    module load shifter
+    shifter --image=endix1029/ufcg:v1.0.5 -- ufcg --help
+
+Total data:
+
+    # put data in `/home/js7t/personal/fungal-phylo/raw_data/aimee_epf/reads`
+    while read i; do 
+       cp $i . 
+    done <reads.lst
+
+
 Timing:
 - Running on EPFG1 (~2.3GB of combined data) with 16 cpus, takes ~1.5 hour to get to the end of ERROR_CORRECTION
 - Same data but 32 cpus, takes ~51 min to get to the end of ERROR_CORRECTION
