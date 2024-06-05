@@ -22,6 +22,11 @@ Running with test data:
     module load shifter
     shifter --image=endix1029/ufcg:v1.0.5 -- ufcg --help
 
+
+    ## testing entrez retrieval with metarhizium (whole genus is ID 5529)
+    nextflow run . -resume --samplesheet input/samplesheet_metatest.csv --ncbi_taxid 5530
+
+
 Total data:
 
     # put data in `/home/js7t/personal/fungal-phylo/raw_data/aimee_epf/reads`
@@ -55,7 +60,7 @@ Timing:
     - Tools used: `funannotate`
 - `QUAST` assesses the quality of the genome assembly, optionally with a reference genome
     - Not sure the best genomes to use for most purposes, so ue of reference is not implemented yet
-    - TODO: remove to  `QUAST_NEW` as it only gets used for new genomes
+    - TODO: rename to  `QUAST_NEW` as it only gets used for new genomes
 - `UFCG_PROFILE` runs `ufcg profile` using container on a single sample, pulling out default core genes
 
 ### To-add
@@ -67,7 +72,7 @@ Timing:
         - or use official NCBI Docker image: https://github.com/ncbi/docker/tree/master/edirect 
 - `UFCG_METADATA` creates a .tsv file of metadata for the UFCG pipeline
     - Tools used: probably just `bash` 
-- `QUAST_SUPPLIED` runs `quast` on genomes that were not assembled using this pipeline
+- `QUAST_EXISTING` runs `quast` on genomes that were not assembled using this pipeline
 - `ASSEMBLY_VIZ` uses outputs from `quast` processes to produce plots comparing the contiguity and quality of your new genomes and your supplied genomes
 
 

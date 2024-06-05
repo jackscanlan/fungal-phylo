@@ -1,15 +1,14 @@
-process UFCG_PROFILE {
-    def module_name = "ufcg_profile"
-    tag "$sample"
+process UFCG_TREE {
+    def module_name = "ufcg_tree"
+    tag "$params.ncbi_taxid"
     // label:  
-    cpus 16
+    cpus 32
     cache true
 
     input:
-    tuple val(sample), path(scaffolds)
+    tuple val(sample), path(ucg)
 
     output:
-    tuple val(sample), path("${sample}.ucg"), emit: ucg
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 
@@ -23,8 +22,6 @@ process UFCG_PROFILE {
     ### run module code
     bash ${module_name}.sh \
         ${projectDir} \
-        ${sample} \
-        ${scaffolds} \
         ${task.cpus}
     
     """

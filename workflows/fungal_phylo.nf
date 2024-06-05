@@ -59,7 +59,7 @@ if (params.help) {
     IMPORT LOCAL MODULES/SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
+include { FIND_ASSEMBLIES                                     } from '../modules/find_assemblies'
 include { COMBINE_LANES                             } from '../modules/combine_lanes'
 include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
 include { ERROR_CORRECTION                          } from '../modules/error_correction'
@@ -67,6 +67,8 @@ include { ASSEMBLY                                  } from '../modules/assembly'
 include { CLEAN_ASSEMBLY                                  } from '../modules/clean_assembly'
 include { QUAST                                     } from '../modules/quast'
 include { UFCG_PROFILE                                     } from '../modules/ufcg_profile'
+include { UFCG_PROFILE as UFCG_PROFILE_OLD                                } from '../modules/ufcg_profile'
+include { UFCG_TREE                                     } from '../modules/ufcg_tree'
 
 
 
@@ -128,6 +130,31 @@ workflow FUNGAL_PHYLO {
     */
 
     // ch_input.view()
+    ch_genomes_existing = Channel.empty()
+
+    if (params.ncbi_taxid) {
+        //// get all genomes assemblies from a specific taxid
+        FIND_ASSEMBLIES ( params.ncbi_taxid )
+
+        //// format output channel as [ accession, scaffolds ]
+        ch_genomes_existing = 
+            FIND_ASSEMBLIES.out.genomes
+            .flatten()
+            .map { file ->
+                def base = file.name.lastIndexOf('.').with {it != -1 ? file.name[0..<it] : file.name}
+                def accession = ( base =~ /^(.*?\.\d+)_.*?$/ )[0][1]
+                [ accession, file ]
+            }
+            .concat ( ch_genomes_existing )
+
+        //// run quast on existing assemblies
+
+        //// run UFCG_PROFILE on existing genomes
+        UFCG_PROFILE_OLD ( ch_genomes_existing ) 
+
+    }
+
+    
 
     //// if input reads are split across lanes, combine fwd and rev into 
     /// NOTE: Input reads need to be in the ./data directory for the code to work at the moment
@@ -148,12 +175,12 @@ workflow FUNGAL_PHYLO {
     //// join error-corrected reads with the cleaned assembly scaffolds
     ERROR_CORRECTION.out.reads 
         .join ( CLEAN_ASSEMBLY.out.scaffolds, by: 0 )
-        .set { ch_quast_input } 
+        .set { ch_genomes_new } 
 
     //// assess assembly quality
-    QUAST ( ch_quast_input )
+    QUAST ( ch_genomes_new )
 
-    ch_quast_input
+    ch_genomes_new
         .map { sample, fwd_reads, rev_reads, unpaired_reads, scaffolds ->
              [ sample, scaffolds ] }
         .set { ch_ufcg_profile_input }
@@ -168,15 +195,21 @@ workflow FUNGAL_PHYLO {
     If .tsv metadata is not provided, I think it assumes all the files in the directory it is pointed to are .fasta and will try to extract profiles.
     */
 
+
     //// make UFCG profile from single genome assembly
     UFCG_PROFILE ( ch_ufcg_profile_input )
+
+    UFCG_PROFILE_OLD.out
+        .concat ( UFCG_PROFILE.out )
+        
+        .set { ch_ufcg_tree_input }
 
     //// combine .ucg profile files into a single channel
     // UFCG_PROFILE.out.ucg
     //     .
 
     //// make phylogeny from UFCG profiles
-    // UFCG_TREE (  )
+    UFCG_TREE ( ch_ufcg_tree_input )
     /* 
     Use BUSCO sequences, core sequences or rDNA sequences?
     */

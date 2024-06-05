@@ -1,13 +1,16 @@
 process FIND_ASSEMBLIES {
     def module_name = "find_assemblies"
-    tag "$sample"
+    tag "TaxID $ncbi_taxid"
     // label:  
     cpus 1
+    cache true
 
     input:
+    val(ncbi_taxid)
 
     output:
-
+    path("*.fna"), emit: genomes
+    path("genomes_${ncbi_taxid}.tsv"), emit: tsv
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 
@@ -21,6 +24,7 @@ process FIND_ASSEMBLIES {
     ### run module code
     bash ${module_name}.sh \
         ${projectDir} \
+        ${ncbi_taxid}
 
     
     """
