@@ -2,13 +2,13 @@ process CLEAN_ASSEMBLY {
     def module_name = "clean_assembly"
     tag "$sample"
     // label:  
-    cpus 1
+    cpus 8
 
     input:
     tuple val(sample), path(scaffolds)
 
     output:
-    tuple val(sample), path("${2}_scaffolds.final.fasta"), emit: scaffolds
+    tuple val(sample), path("${sample}_scaffolds.clean.fasta"), emit: scaffolds
 
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'

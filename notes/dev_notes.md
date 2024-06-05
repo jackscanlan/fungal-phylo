@@ -12,8 +12,11 @@ Running with test data:
     sinteractive -c16
     # load modules (Nextflow installed locally)
     module load Java/17.0.6
-    # run nextflow
+    # run nextflow one one sample
     nextflow run . -resume --samplesheet input/samplesheet_test.csv
+    # run nextflow on three samples
+    nextflow run . -resume --samplesheet input/samplesheet_metatest.csv
+
 
     ## testing ufcg
     module load shifter

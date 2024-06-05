@@ -1,14 +1,13 @@
-process COMBINE_LANES {
-    def module_name = "combine_lanes"
+process FIND_ASSEMBLIES {
+    def module_name = "find_assemblies"
     tag "$sample"
     // label:  
     cpus 1
 
     input:
-    tuple val(sample), val(fwd_reads), val(rev_reads)
 
-    output:   
-    tuple val(sample), path("*_R1.fastq.gz"), path("*_R2.fastq.gz"),          emit: reads
+    output:
+
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 
@@ -22,9 +21,7 @@ process COMBINE_LANES {
     ### run module code
     bash ${module_name}.sh \
         ${projectDir} \
-        ${sample} \
-        ${fwd_reads} \
-        ${rev_reads} 
+
     
     """
 

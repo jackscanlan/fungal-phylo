@@ -2,7 +2,7 @@ process QUAST {
     def module_name = "quast"
     tag "$sample"
     // label:  
-    cpus 32
+    cpus 16
 
     input:
     tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads), path(scaffolds)

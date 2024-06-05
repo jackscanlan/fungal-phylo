@@ -17,25 +17,27 @@ else
     shifterimg pull docker:nextgenusfs/funannotate:v1.8.17
 fi
 
-## remove short (<500 bp) and/or duplicated contigs from assembly
-# run funannotate clean
-shifter \
-    --image=nextgenusfs/funannotate:v1.8.17 \
-    -- \
-    funannotate clean \
-    --input $3 \
-    --out ${2}_scaffolds.clean.fasta \
-    --pident 99 \
-    --cov 99 \
-    --minlen 500 \
-    --exhaustive
-
 ## rename scaffolds
 # run funannotate sort
 shifter \
     --image=nextgenusfs/funannotate:v1.8.17 \
     -- \
     funannotate sort \
-    --input ${2}_scaffolds.clean.fasta \
-    --out ${2}_scaffolds.final.fasta \
-    --base scaffold
+    --input $3 \
+    --out ${2}_scaffolds.sorted.fasta \
+    --base scaffold \
+    --minlen 500
+
+## remove short (<500 bp) and/or duplicated contigs from assembly
+# run funannotate clean
+shifter \
+    --image=nextgenusfs/funannotate:v1.8.17 \
+    -- \
+    funannotate clean \
+    --input ${2}_scaffolds.sorted.fasta \
+    --out ${2}_scaffolds.clean.fasta \
+    --cpus ${4} \
+    --pident 99 \
+    --cov 99 \
+    --minlen 500 
+
