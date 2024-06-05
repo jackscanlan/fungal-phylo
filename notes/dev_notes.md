@@ -24,7 +24,7 @@ Running with test data:
 
 
     ## testing entrez retrieval with metarhizium (whole genus is ID 5529)
-    nextflow run . -resume --samplesheet input/samplesheet_metatest.csv --ncbi_taxid 5530
+    nextflow run . -resume --samplesheet input/samplesheet_metatest.csv --ncbi_taxid 5529
 
 
 Total data:

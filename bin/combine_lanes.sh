@@ -13,7 +13,7 @@ set -u
 # convert commas to new lines in input string
 FWD_READS_FILES=$(sed 's#,#\n#g' <<< $3)
 # if relative path, append projectDir at the start of each new line to produce absolute file paths
-if echo "$3" | grep -q "^$1"; then
+if echo "$3" | grep -q "^/"; then
     echo "Forward read path already absolute"
 else 
     FWD_READS_FILES=$(sed "s#^#${1}/#g" <<< "${FWD_READS_FILES}")
@@ -27,7 +27,7 @@ cat $FWD_READS_FILES > ${2}_R1.fastq.gz
 # convert commas to new lines in input string
 REV_READS_FILES=$(sed 's#,#\n#g' <<< $4)
 # if relative path, append projectDir at the start of each new line to produce absolute file paths
-if echo "$4" | grep -q "^$1"; then
+if echo "$4" | grep -q "^/"; then
     echo "Reverse read path already absolute"
 else 
     REV_READS_FILES=$(sed "s#^#${1}/#g" <<< "${REV_READS_FILES}")

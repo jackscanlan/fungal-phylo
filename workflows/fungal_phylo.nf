@@ -201,12 +201,22 @@ workflow FUNGAL_PHYLO {
 
     UFCG_PROFILE_OLD.out
         .concat ( UFCG_PROFILE.out )
-        
+
         .set { ch_ufcg_tree_input }
 
     //// combine .ucg profile files into a single channel
     // UFCG_PROFILE.out.ucg
     //     .
+
+
+    /*
+    ** Phylogenetic modules **
+    - use ufcg align to produce alignments of each gene across the .ucg profiles
+    - check alignments for gaps and remove whole alignments if gaps are above a threshold
+    - concatenate alignments and produce 
+    - 
+
+    */
 
     //// make phylogeny from UFCG profiles
     UFCG_TREE ( ch_ufcg_tree_input )
