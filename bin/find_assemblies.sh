@@ -4,6 +4,7 @@ set -u
 ## args are the following:
 # $1 = projectDir 
 # $2 = params.ncbi_taxid
+# $3 = params.limit_external
 
 
 
@@ -61,9 +62,18 @@ shifter \
 	./genomes_${2}/ncbi_dataset/data/assembly_data_report.jsonl \
     > genomes_${2}.lst
 
+# check that no GCA or GCF accessions share the same code (as they are the same)
+# if they do, subset to only keep GCF
+
 # add headers to .tsv
 HEADER="Label\tAccession\tTaxon name\tTaxid"
 echo -e "$HEADER" | cat - genomes_${2}_body.tsv > genomes_${2}.tsv
+
+
+### TODO: if $3 (limit_external) is true, pare genomes down to one per 'Taxid' value
+
+
+
 
 # pull genomes out of directory structure
 while read i; do 

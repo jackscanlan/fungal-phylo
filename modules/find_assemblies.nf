@@ -7,9 +7,10 @@ process FIND_ASSEMBLIES {
 
     input:
     val(ncbi_taxid)
+    val(limit_external)
 
     output:
-    path("*.fna"), emit: genomes
+    path("*.fna"), emit: genome
     path("genomes_${ncbi_taxid}.tsv"), emit: tsv
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
@@ -24,7 +25,8 @@ process FIND_ASSEMBLIES {
     ### run module code
     bash ${module_name}.sh \
         ${projectDir} \
-        ${ncbi_taxid}
+        ${ncbi_taxid} \
+        ${limit_external}
 
     
     """

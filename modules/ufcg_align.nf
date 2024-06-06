@@ -1,12 +1,12 @@
-process UFCG_TREE {
-    def module_name = "ufcg_tree"
-    tag "$params.ncbi_taxid"
+process UFCG_ALIGN {
+    def module_name = "ufcg_align"
+    tag "Whole pipeline"
     // label:  
     cpus 32
     cache true
 
     input:
-    tuple val(sample), path(ucg)
+    // tuple val(sample), path(ucg)
 
     output:
 

@@ -6,6 +6,7 @@ process QUAST {
 
     input:
     tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads), path(scaffolds)
+    val(genome_type) // must be "new" or "old"
 
     output:
     tuple val(sample), path("${sample}_report.tsv"), emit: report_tsv
@@ -28,7 +29,8 @@ process QUAST {
         ${rev_reads} \
         ${unpaired_reads} \
         ${scaffolds} \
-        ${task.cpus}
+        ${task.cpus} \
+        ${genome_type}
     
     """
 

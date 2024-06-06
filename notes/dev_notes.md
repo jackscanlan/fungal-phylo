@@ -44,6 +44,11 @@ Timing:
 
 ### Current progress
 
+Subworkflow '
+- `FIND_ASSEMBLIES` finds and downloads genome assembly accessions in NCBI within a specified taxonomic group
+    - Tools used: `datasets` to download assemblies from NCBI and `jq` to parse the JSON output to produce a metadata .tsv
+
+
 - `COMBINE_LANES` concatenates input .fastq files that are split across multiple lanes (eg. two pairs of fwd and rev reads due to being sequenced on two lanes)
     - Tools used: none
 - `READ_PREPROCESSING` discovers adapters by pair overlap, trims adapters, removes phiX spike-in contamination, and merges mergable paired-end reads (using `vstrict` option)
@@ -66,10 +71,6 @@ Timing:
 ### To-add
 
 
-- `FIND_ASSEMBLIES` finds genome assembly accessions in NCBI within a specified taxonomic group
-- `RETRIEVE_ASSEMBLIES` retrieves genome assemblies from NCBI based on a list of accessions
-    - Tools used: `entrezdirect` (`entrezdirect/13.1.20200107-GCCcore-8.2.0` in BASC)
-        - or use official NCBI Docker image: https://github.com/ncbi/docker/tree/master/edirect 
 - `UFCG_METADATA` creates a .tsv file of metadata for the UFCG pipeline
     - Tools used: probably just `bash` 
 - `QUAST_EXISTING` runs `quast` on genomes that were not assembled using this pipeline

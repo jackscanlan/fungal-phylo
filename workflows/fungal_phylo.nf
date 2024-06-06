@@ -59,6 +59,35 @@ if (params.help) {
     IMPORT LOCAL MODULES/SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
+    /*
+    Subworkflow structure:
+        - GENOME_ASSEMBLY takes raw reads and assemblies 'new' genomes
+        - GENOME_ANNOTATION takes new genomes and supplied unannotated genomes and annotates using specified high-quality annotated genomes from NCBI
+        - CUSTOM_MARKERS takes specified .fasta files and trains UFCG model for use with UFCG profile
+        - INTERNAL_GENOMES takes unannotated local assemblies ('internal' genomes) and parses them to feed into GENOME_ANNOTATION and PHYLOGENOMICS
+        - EXTERNAL_GENOMES downloads 'external' genomes from NCBI from a particular taxonomic group
+            - needs options to limit/prune number of genomes: ie. only keep the best genome (highest N50 or assembly level) per strain or species; 
+        - PHYLOGENOMICS takes new, internal and external genome assemblies, as well as custom markers, and extracts sequences, aligns, and makes phylogenetic trees
+            - needs options to specify marker genes to be used (core, custom, core + custom, BUSCO etc.)
+            - IQTREE2 can use folders of alignments when generating partition and concatenations
+    */
+
+
+// subworkflows
+// include { CUSTOM_MARKERS                                     } from '../subworkflows/custom_markers'
+include { EXTERNAL_GENOMES                                     } from '../subworkflows/external_genomes'
+// include { GENOME_ANNOTATION                                     } from '../subworkflows/genome_annotation'
+// include { GENOME_ASSEMBLY                                     } from '../subworkflows/genome_assembly'
+// include { INTERNAL_GENOMES                                     } from '../subworkflows/internal_genomes'
+// include { PHYLOGENOMICS                                     } from '../subworkflows/phylogenomics'
+// include { VISUALISATION                                     } from '../subworkflows/visualisation'
+
+
+
+
+
+// modules
 include { FIND_ASSEMBLIES                                     } from '../modules/find_assemblies'
 include { COMBINE_LANES                             } from '../modules/combine_lanes'
 include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
@@ -67,7 +96,6 @@ include { ASSEMBLY                                  } from '../modules/assembly'
 include { CLEAN_ASSEMBLY                                  } from '../modules/clean_assembly'
 include { QUAST                                     } from '../modules/quast'
 include { UFCG_PROFILE                                     } from '../modules/ufcg_profile'
-include { UFCG_PROFILE as UFCG_PROFILE_OLD                                } from '../modules/ufcg_profile'
 include { UFCG_TREE                                     } from '../modules/ufcg_tree'
 
 
@@ -83,6 +111,9 @@ include { STOP                                      } from '../modules/stop'
 */
 
 workflow FUNGAL_PHYLO {
+
+
+
 
     /*
     General ideas for workflow:
@@ -130,28 +161,10 @@ workflow FUNGAL_PHYLO {
     */
 
     // ch_input.view()
-    ch_genomes_existing = Channel.empty()
+    ch_genomes_external = Channel.empty()
 
-    if (params.ncbi_taxid) {
-        //// get all genomes assemblies from a specific taxid
-        FIND_ASSEMBLIES ( params.ncbi_taxid )
-
-        //// format output channel as [ accession, scaffolds ]
-        ch_genomes_existing = 
-            FIND_ASSEMBLIES.out.genomes
-            .flatten()
-            .map { file ->
-                def base = file.name.lastIndexOf('.').with {it != -1 ? file.name[0..<it] : file.name}
-                def accession = ( base =~ /^(.*?\.\d+)_.*?$/ )[0][1]
-                [ accession, file ]
-            }
-            .concat ( ch_genomes_existing )
-
-        //// run quast on existing assemblies
-
-        //// run UFCG_PROFILE on existing genomes
-        UFCG_PROFILE_OLD ( ch_genomes_existing ) 
-
+    if ( params.ncbi_taxid ) {
+        EXTERNAL_GENOMES ( params.ncbi_taxid,  )
     }
 
     
@@ -201,7 +214,7 @@ workflow FUNGAL_PHYLO {
 
     UFCG_PROFILE_OLD.out
         .concat ( UFCG_PROFILE.out )
-
+        .collect ()
         .set { ch_ufcg_tree_input }
 
     //// combine .ucg profile files into a single channel
