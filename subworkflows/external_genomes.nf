@@ -11,6 +11,7 @@ include { QUAST as QUAST_EXTERNAL                                               
 workflow EXTERNAL_GENOMES {
 
     take:
+    
     ncbi_taxid
     limit_external
 
@@ -29,7 +30,7 @@ workflow EXTERNAL_GENOMES {
             // get accession from basename
             def accession = ( base =~ /^(.*?\.\d+)_.*?$/ )[0][1]
             // channel output format
-            [ accession, "null", "null", "null", file ]
+            [ accession, "$projectDir/assets/NO_FILE1", "$projectDir/assets/NO_FILE2", "$projectDir/assets/NO_FILE3", file ]
         }
         .set { ch_genomes_external }
 
@@ -38,6 +39,7 @@ workflow EXTERNAL_GENOMES {
 
 
     emit:
+    
     assembly_seq_genomes_external
     assembly_report_genomes_external = FIND_ASSEMBLIES.out.tsv
     quast_report_genomes_external = QUAST_EXTERNAL.out.report_tsv

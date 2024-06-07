@@ -41,7 +41,7 @@ if [[ $8 == "new" ]]; then
             --split-scaffolds
     fi 
 # if assembly is internal or external and therefore doesn't have reads associated
-else if [[ $8 == "old" ]]; then
+elif [[ $8 == "old" ]]; then
     quast.py \
     $6 \
     -o . \

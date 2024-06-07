@@ -44,6 +44,7 @@ else
 fi
 
 ## use jq to extract relevant fields
+### TODO: add N50 and assembly level in there to compare assemblies
 # create .tsv
 shifter \
     --image=ddev/ddev-utilities:latest \
@@ -67,15 +68,42 @@ shifter \
 
 # add headers to .tsv
 HEADER="Label\tAccession\tTaxon name\tTaxid"
-echo -e "$HEADER" | cat - genomes_${2}_body.tsv > genomes_${2}.tsv
+echo -e "$HEADER" | cat - genomes_${2}_body.tsv > genomes_${2}.all.tsv
 
 
 ### TODO: if $3 (limit_external) is true, pare genomes down to one per 'Taxid' value
+if [[ $3 == "true" ]]; then
+    
+    # conditional to pull and convert Docker image or not
+    if shifterimg images | grep -q "rocker/tidyverse:4.4.0"; then
+        echo "rocker/tidyverse Docker image already exists."
+    else 
+        # pull docker image and convert
+        shifterimg pull docker:rocker/tidyverse:4.4.0
+    fi
+
+    # use R::tidyverse to subset data (could maybe do it in bash but complicated)
+    shifter \
+        --image=rocker/tidyverse:4.4.0 \
+        -- \
+        Rscript --vanilla \
+        limit_external.R \
+        genomes_${2}.all.tsv \
+        genomes_${2}.tsv \
+        genomes_cull.txt
+
+    # remove assemblies in genomes_cull.txt
 
 
-
+elif [[ $3 == "false" ]]; then
+    # rename all file to output file
+    mv genomes_${2}.all.tsv genomes_${2}.tsv
+else 
+    echo "$3 must be 'true' or 'false'."
+    exit 1
+fi
 
 # pull genomes out of directory structure
 while read i; do 
-       mv ./genomes_${2}/ncbi_dataset/data/${i}/${i}* . 
-    done <genomes_${2}.lst
+    mv ./genomes_${2}/ncbi_dataset/data/${i}/${i}* . 
+done <genomes_${2}.lst
