@@ -1,9 +1,7 @@
 process FIND_ASSEMBLIES {
     def module_name = "find_assemblies"
     tag "TaxID $ncbi_taxid"
-    // label:  
-    cpus 1
-    cache true
+    label "small"
 
     input:
     val(ncbi_taxid)

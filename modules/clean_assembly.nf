@@ -1,8 +1,7 @@
 process CLEAN_ASSEMBLY {
     def module_name = "clean_assembly"
     tag "$sample"
-    // label:  
-    cpus 8
+    label "medium"
 
     input:
     tuple val(sample), path(scaffolds)

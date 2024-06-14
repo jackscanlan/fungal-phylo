@@ -1,8 +1,7 @@
 process ASSEMBLY {
     def module_name = "assembly"
     tag "$sample"
-    // label:  
-    cpus 16
+    label "very_high" 
 
     input:
     tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads)

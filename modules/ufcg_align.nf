@@ -1,9 +1,7 @@
 process UFCG_ALIGN {
     def module_name = "ufcg_align"
     tag "Whole pipeline"
-    // label:  
-    cpus 32
-    cache true
+    label "very_high" 
 
     input:
     // tuple val(sample), path(ucg)

@@ -75,12 +75,12 @@ if (params.help) {
 
 
 // subworkflows
-include { CUSTOM_MARKERS                                     } from '../subworkflows/custom_markers'
-include { EXTERNAL_GENOMES                                     } from '../subworkflows/external_genomes'
-include { GENOME_ANNOTATION                                     } from '../subworkflows/genome_annotation'
+// include { CUSTOM_MARKERS                                     } from '../subworkflows/custom_markers'
+include { REPOSITORY_GENOMES                                     } from '../subworkflows/repository_genomes'
+// include { GENOME_ANNOTATION                                     } from '../subworkflows/genome_annotation'
 include { GENOME_ASSEMBLY                                     } from '../subworkflows/genome_assembly'
-include { INTERNAL_GENOMES                                     } from '../subworkflows/internal_genomes'
-include { PHYLOGENOMICS                                     } from '../subworkflows/phylogenomics'
+// include { LOCAL_GENOMES                                     } from '../subworkflows/local_genomes'
+// include { PHYLOGENOMICS                                     } from '../subworkflows/phylogenomics'
 // include { VISUALISATION                                     } from '../subworkflows/visualisation'
 
 
@@ -142,12 +142,13 @@ workflow FUNGAL_PHYLO {
     */
 
     //// make empty channels
-    ch_genome_reads         = Channel.empty()
-    ch_genomes_new          = Channel.empty()
-    ch_genomes_external     = Channel.empty()
-    ch_genomes_internal     = Channel.empty()
-    ch_genomes_all          = Channel.empty()
-    ch_custom_markers       = Channel.empty()
+    ch_genome_reads             = Channel.empty()
+    ch_genomes_new              = Channel.empty()
+    ch_genomes_repository       = Channel.empty()
+    ch_genomes_local_input      = Channel.empty()
+    ch_genomes_local            = Channel.empty()
+    ch_genomes_all              = Channel.empty()
+    ch_custom_markers           = Channel.empty()
 
     Channel.fromPath(params.samplesheet)
         .splitCsv ( header: true )
@@ -160,6 +161,7 @@ workflow FUNGAL_PHYLO {
             [ row.sample, fwd_reads, rev_reads ]
             }
         .concat ( ch_genome_reads )
+        .set { ch_genome_reads }
 
     /* TODO: '.branch' samplesheet channel into: 
     - 'reads': raw sequencing reads (.fastq files) -- concats with ch_genome_reads
@@ -171,19 +173,19 @@ workflow FUNGAL_PHYLO {
 
     //// pull and process external genomes
     if ( params.ncbi_taxid ) {
-        EXTERNAL_GENOMES ( 
+        REPOSITORY_GENOMES ( 
             params.ncbi_taxid, 
-            params.limit_external 
+            params.repository_limit 
         )
     }
 
 
-    //// process internal genomes
-    if ( ch_genomes_internal ) {
-        INTERNAL_GENOMES (
-            ch_genomes_internal
-        )
-    }
+    // //// process internal genomes
+    // if ( ch_genomes_local_input ) {
+    //     LOCAL_GENOMES (
+    //         ch_genomes_local_input
+    //     )
+    // }
 
 
     //// assemble new genomes 
@@ -196,24 +198,24 @@ workflow FUNGAL_PHYLO {
     // concat output with empty ch_genomes_new
     ch_genomes_new = 
         ch_genomes_new
-        .concat ( assembly_seq_genomes_new )
+        .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
 
 
-    //// annotate new genomes
-    if ( ch_genomes_new ) {
-        GENOME_ANNOTATION (
-            ch_genomes_new
-        )
-    }
+    // //// annotate new genomes
+    // if ( ch_genomes_new ) {
+    //     GENOME_ANNOTATION (
+    //         ch_genomes_new
+    //     )
+    // }
 
 
 
-    //// produce custom marker profiles
-    if ( params.custom_markers ) { // only make custom m
-        CUSTOM_MARKERS ( 
-            params.custom_markers 
-        )
-    }
+    // //// produce custom marker profiles
+    // if ( params.custom_markers ) { // only make custom m
+    //     CUSTOM_MARKERS ( 
+    //         params.custom_markers 
+    //     )
+    // }
 
     // concat CUSTOM_MARKERS output with empty ch_custom_markers channel
 
@@ -223,14 +225,16 @@ workflow FUNGAL_PHYLO {
     ch_genomes_all = 
         ch_genomes_all
         .concat ( ch_genomes_new )
-        .concat ( ch_genomes_interal )
-        .concat ( ch_genomes_external )
+        .concat ( ch_genomes_local )
+        .concat ( ch_genomes_repository )
 
-    PHYLOGENOMICS (
-        // ch_genomes_all
-        // ch_custom_markers
-        // // channel of .tsv metadata
-    )
+    ch_genomes_all .view()
+
+    // PHYLOGENOMICS (
+    //     // ch_genomes_all
+    //     // ch_custom_markers
+    //     // // channel of .tsv metadata
+    // )
 
     // /* 
     // NOTE: UFCG_PROFILE requires all assemblies be placed in a single directory, ideally with a metadata .tsv containing the following:
@@ -243,8 +247,8 @@ workflow FUNGAL_PHYLO {
     // */
 
 
-    // //// make UFCG profile from single genome assembly
-    // UFCG_PROFILE ( ch_ufcg_profile_input )
+    //// make UFCG profile from single genome assembly
+    UFCG_PROFILE ( ch_ufcg_profile_input )
 
     // UFCG_PROFILE_OLD.out
     //     .concat ( UFCG_PROFILE.out )
@@ -255,6 +259,7 @@ workflow FUNGAL_PHYLO {
     // // UFCG_PROFILE.out.ucg
     // //     .
 
+    UFCG_ALIGN ( )
 
     // /*
     // ** Phylogenetic modules **

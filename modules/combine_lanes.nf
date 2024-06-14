@@ -1,8 +1,7 @@
 process COMBINE_LANES {
     def module_name = "combine_lanes"
     tag "$sample"
-    // label:  
-    cpus 1
+    label "very_small"    
 
     input:
     tuple val(sample), val(fwd_reads), val(rev_reads)

@@ -7,7 +7,7 @@
 
 
 
-workflow INTERNAL_GENOMES {
+workflow LOCAL_GENOMES {
     
     take:
 

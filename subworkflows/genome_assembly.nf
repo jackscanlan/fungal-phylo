@@ -43,7 +43,7 @@ workflow GENOME_ASSEMBLY {
         .set { ch_quast_new_input } // card: sample, fwd_reads, rev_reads, unpaired_reads, scaffolds
 
     //// assess assembly quality
-    QUAST_NEW ( ch_quast_new_input )
+    QUAST_NEW ( ch_quast_new_input, "new" )
 
     
     

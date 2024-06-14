@@ -26,6 +26,16 @@ Running with test data:
     ## testing entrez retrieval with metarhizium (whole genus is ID 5529)
     nextflow run . -resume --samplesheet input/samplesheet_metatest.csv --ncbi_taxid 5529
 
+Running with test data, testing basc_slurm:
+
+    # start head job
+    sinteractive -c2
+    # load modules (Nextflow installed locally)
+    module load Java/17.0.6
+    # run 
+    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_metatest.csv --ncbi_taxid 5529
+
+
 
 Total data:
 

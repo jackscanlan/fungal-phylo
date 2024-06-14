@@ -1,9 +1,7 @@
 process UFCG_PROFILE {
     def module_name = "ufcg_profile"
     tag "$sample"
-    // label:  
-    cpus 16
-    cache true
+    label "very_high"
 
     input:
     tuple val(sample), path(scaffolds)

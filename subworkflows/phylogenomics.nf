@@ -1,5 +1,5 @@
 /*
- *  Extract profile genes
+ *  Extract profile genes, align and build trees
  */
 
 

@@ -1,8 +1,7 @@
 process READ_PREPROCESSING {
     def module_name = "read_preprocessing"
     tag "$sample"
-    // label:  
-    cpus 16
+    label "high" 
 
     input:
     tuple val(sample), path(fwd_reads), path(rev_reads)
