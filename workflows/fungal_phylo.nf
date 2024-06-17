@@ -88,7 +88,8 @@ include { GENOME_ASSEMBLY                                     } from '../subwork
 
 
 // modules
-include { FIND_ASSEMBLIES                                     } from '../modules/find_assemblies'
+include { FIND_ASSEMBLIES_GROUP                                     } from '../modules/find_assemblies_group'
+include { FIND_ASSEMBLIES_SINGLE                                    } from '../modules/find_assemblies_single'
 include { COMBINE_LANES                             } from '../modules/combine_lanes'
 include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
 include { ERROR_CORRECTION                          } from '../modules/error_correction'
@@ -142,16 +143,40 @@ workflow FUNGAL_PHYLO {
     */
 
     //// make empty channels
-    ch_genome_reads             = Channel.empty()
+    ch_samples_new              = Channel.empty()
+    ch_samples_local            = Channel.empty()
+    ch_samples_repository       = Channel.empty()
     ch_genomes_new              = Channel.empty()
     ch_genomes_repository       = Channel.empty()
-    ch_genomes_local_input      = Channel.empty()
     ch_genomes_local            = Channel.empty()
     ch_genomes_all              = Channel.empty()
     ch_custom_markers           = Channel.empty()
 
-    Channel.fromPath(params.samplesheet)
+
+    /*
+    Samplesheet columns:
+        - type: 'new', 'local' or 'repository', used to branch channel into the three input channels
+        - isolate: strain name (doesn't have to be unique, for resequencing of the same strain etc.)
+        - sample: name of sample used for files, must be unique
+        - genome_file: path to .fasta or .fna; for 'local' samples only (else put NA)
+        - accession: NCBI genome accession (ie. "GCA" or "GCF" prefix), for 'repository' samples only (else put NA)
+        - taxid: NCBI taxid, for 'repository' samples only (else put NA)
+        - fwd[X]: path to forward-read .fastq for lane X; for 'new' samples only (else put NA)
+        - rev[X]: path to reverse-read .fastq for lane X; for 'new' samples only (else put NA)
+            - note: you can have as many lanes as you like but they must be paired correctly
+    */
+
+
+    //// parse samplesheet
+    Channel.fromPath (params.samplesheet)
         .splitCsv ( header: true )
+        .set { ch_samplesheet}
+
+    // ch_samplesheet.view()
+
+    //// populate ch_samples_new
+    ch_samplesheet
+        .filter { row -> row.type == "new" }  
         .map { row ->
             // concatenate all values from columns/keys starting with 'fwd' into a string delimited by commas
             def fwd_reads = row.findAll { it.key.startsWith('fwd') } .values() .join(",") 
@@ -160,22 +185,36 @@ workflow FUNGAL_PHYLO {
             // output tuple
             [ row.sample, fwd_reads, rev_reads ]
             }
-        .concat ( ch_genome_reads )
-        .set { ch_genome_reads }
+        .concat ( ch_samples_new )
+        .set { ch_samples_new }
 
-    /* TODO: '.branch' samplesheet channel into: 
-    - 'reads': raw sequencing reads (.fastq files) -- concats with ch_genome_reads
-    - 'assembly': existing unannotated assemblies (.fasta or NCBI accession)
-    - 'complete': annotated, assembled genomes with NCBI accession (NCBI accession)
-    
-    */
+    // ch_samples_new .view()
+
+    /// populate ch_samples_local
+    ch_samplesheet
+        .filter { row -> row.type == "local" }  
+        .map { row -> [ row.sample, row.genome_file ]}
+        .concat ( ch_samples_local )
+        .set { ch_samples_local }
+
+    // ch_samples_local .view()
+
+    /// populate ch_samples_repository
+    ch_samplesheet
+        .filter { row -> row.type == "repository" }  
+        .map { row -> row.accession }
+        .concat ( ch_samples_repository )
+        .set { ch_samples_repository }
+
+    // ch_samples_repository .view()
 
 
     //// pull and process external genomes
-    if ( params.ncbi_taxid ) {
+    if ( params.ncbi_taxid || ch_samples_repository ) {
         REPOSITORY_GENOMES ( 
             params.ncbi_taxid, 
-            params.repository_limit 
+            params.repository_limit,
+            ch_samples_repository 
         )
     }
 
@@ -189,16 +228,16 @@ workflow FUNGAL_PHYLO {
 
 
     //// assemble new genomes 
-    if ( ch_genome_reads ) { // only assemble genomes if ch_genome_reads is not empty
-        GENOME_ASSEMBLY ( 
-            ch_genome_reads 
-        )
-    }
+    // if ( ch_genome_reads ) { // only assemble genomes if ch_genome_reads is not empty
+    //     GENOME_ASSEMBLY ( 
+    //         ch_genome_reads 
+    //     )
+    // }
 
     // concat output with empty ch_genomes_new
-    ch_genomes_new = 
-        ch_genomes_new
-        .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
+    // ch_genomes_new = 
+    //     ch_genomes_new
+    //     .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
 
 
     // //// annotate new genomes
@@ -222,13 +261,13 @@ workflow FUNGAL_PHYLO {
 
     //// extract sequences, align and build phylogenetic trees
     // concat ch_genomes_new, ch_genomes_internal and ch_genomes_external
-    ch_genomes_all = 
-        ch_genomes_all
-        .concat ( ch_genomes_new )
-        .concat ( ch_genomes_local )
-        .concat ( ch_genomes_repository )
+    // ch_genomes_all = 
+    //     ch_genomes_all
+    //     .concat ( ch_genomes_new )
+    //     .concat ( ch_genomes_local )
+    //     .concat ( ch_genomes_repository )
 
-    ch_genomes_all .view()
+    // ch_genomes_all .view()
 
     // PHYLOGENOMICS (
     //     // ch_genomes_all
@@ -248,7 +287,7 @@ workflow FUNGAL_PHYLO {
 
 
     //// make UFCG profile from single genome assembly
-    UFCG_PROFILE ( ch_ufcg_profile_input )
+    // UFCG_PROFILE ( ch_ufcg_profile_input )
 
     // UFCG_PROFILE_OLD.out
     //     .concat ( UFCG_PROFILE.out )
@@ -259,7 +298,7 @@ workflow FUNGAL_PHYLO {
     // // UFCG_PROFILE.out.ucg
     // //     .
 
-    UFCG_ALIGN ( )
+    // UFCG_ALIGN ( )
 
     // /*
     // ** Phylogenetic modules **

@@ -35,6 +35,11 @@ Running with test data, testing basc_slurm:
     # run 
     nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_metatest.csv --ncbi_taxid 5529
 
+Testing split samplesheet:
+
+    module load Java/17.0.6
+    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv
+
 
 
 Total data:
