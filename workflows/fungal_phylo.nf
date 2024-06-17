@@ -147,6 +147,7 @@ workflow FUNGAL_PHYLO {
     ch_samples_local            = Channel.empty()
     ch_samples_repository       = Channel.empty()
     ch_genomes_new              = Channel.empty()
+    ch_ncbi_taxid               = Channel.empty()
     ch_genomes_repository       = Channel.empty()
     ch_genomes_local            = Channel.empty()
     ch_genomes_all              = Channel.empty()
@@ -209,10 +210,19 @@ workflow FUNGAL_PHYLO {
     // ch_samples_repository .view()
 
 
+    //// parse multi-taxid parameter and add to ch_ncbi_taxid
+    if ( params.ncbi_taxid ) {
+        Channel.of ( params.ncbi_taxid )
+            .map { taxid -> taxid.tokenize(',') }
+            .flatten()
+            .concat ( ch_ncbi_taxid )
+            .set { ch_ncbi_taxid }
+    }
+    
     //// pull and process external genomes
-    if ( params.ncbi_taxid || ch_samples_repository ) {
+    if ( ch_ncbi_taxid || ch_samples_repository ) {
         REPOSITORY_GENOMES ( 
-            params.ncbi_taxid, 
+            ch_ncbi_taxid, 
             params.repository_limit,
             ch_samples_repository 
         )

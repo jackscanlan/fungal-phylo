@@ -1,14 +1,13 @@
-process FIND_ASSEMBLIES_SINGLE {
-    def module_name = "find_assemblies_single"
-    tag "Accession $sample"
-    label "small"
+process COMBINE_TSV {
+    def module_name = "combine_tsv"
+    tag "$sample"
+    label "very_small"
 
     input:
-    val(sample)
+    path(tsvs)
 
     output:
-    path("*.fna"), emit: genome
-    path("genome_${sample}.tsv"), emit: tsv
+    
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 
@@ -22,8 +21,7 @@ process FIND_ASSEMBLIES_SINGLE {
     ### run module code
     bash ${module_name}.sh \
         ${projectDir} \
-        ${sample}
-
+        ${tsvs}
     
     """
 

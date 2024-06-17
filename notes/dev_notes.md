@@ -38,7 +38,17 @@ Running with test data, testing basc_slurm:
 Testing split samplesheet:
 
     module load Java/17.0.6
-    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv
+    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv 
+
+    # with single taxid
+    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 5530
+
+    # with multi taxid (no overlap)
+    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 5530,568076
+    
+    # with multi taxid (overlap)
+    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 5530,5529
+
 
 
 

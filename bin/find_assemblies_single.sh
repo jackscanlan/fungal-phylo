@@ -30,7 +30,8 @@ shifter \
     genome \
     accession $SAMPLE \
     --filename genome_${SAMPLE}.zip \
-    --include genome 
+    --include genome \
+    --assembly-source GenBank
 
 # unzip 
 unzip genome_${SAMPLE}.zip -d genome_${SAMPLE}

@@ -28,7 +28,8 @@ shifter \
     taxon $2 \
     --filename genomes_${2}.zip \
     --exclude-atypical \
-    --include genome 
+    --include genome \
+    --assembly-source GenBank
 
 # unzip 
 unzip genomes_${2}.zip -d genomes_${2}
