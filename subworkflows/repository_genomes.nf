@@ -96,7 +96,7 @@ workflow REPOSITORY_GENOMES {
 
     CHANNEL_TO_FILE ( 
         ch_assemblies_meta_fileinput, 
-        "csv", 
+        "tsv", 
         "accession,label,taxon_name,taxid,genome" 
     )
     

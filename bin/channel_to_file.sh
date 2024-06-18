@@ -43,7 +43,7 @@ elif [[ $3 == "tsv" ]]; then
         > body.${3}
 
     # append header
-    echo $HEADER | cat - body.${3} > out.${3}
+    echo "$HEADER" | cat - body.${3} > out.${3}
 
 else 
     echo "file_type was ${3}, but must be 'csv' or 'tsv'"
