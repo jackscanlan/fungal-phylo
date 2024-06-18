@@ -4,9 +4,11 @@ process UFCG_ALIGN {
     label "very_high" 
 
     input:
-    // tuple val(sample), path(ucg)
+    val(ready)
 
     output:
+    path("align/"), emit: alignment_dir
+
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

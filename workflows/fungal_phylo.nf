@@ -80,7 +80,7 @@ include { REPOSITORY_GENOMES                                     } from '../subw
 // include { GENOME_ANNOTATION                                     } from '../subworkflows/genome_annotation'
 include { GENOME_ASSEMBLY                                     } from '../subworkflows/genome_assembly'
 // include { LOCAL_GENOMES                                     } from '../subworkflows/local_genomes'
-// include { PHYLOGENOMICS                                     } from '../subworkflows/phylogenomics'
+include { PHYLOGENOMICS                                     } from '../subworkflows/phylogenomics'
 // include { VISUALISATION                                     } from '../subworkflows/visualisation'
 
 
@@ -152,6 +152,7 @@ workflow FUNGAL_PHYLO {
     ch_genomes_local            = Channel.empty()
     ch_genomes_all              = Channel.empty()
     ch_custom_markers           = Channel.empty()
+    ch_genomes_metadata         = Channel.empty()
 
 
     /*
@@ -212,7 +213,7 @@ workflow FUNGAL_PHYLO {
 
     //// parse multi-taxid parameter and add to ch_ncbi_taxid
     if ( params.ncbi_taxid ) {
-        Channel.of ( params.ncbi_taxid )
+        Channel.of ( params.ncbi_taxid.toString() )
             .map { taxid -> taxid.tokenize(',') }
             .flatten()
             .concat ( ch_ncbi_taxid )
@@ -226,6 +227,11 @@ workflow FUNGAL_PHYLO {
             params.repository_limit,
             ch_samples_repository 
         )
+
+        ch_genomes_repository = REPOSITORY_GENOMES.out.out_assemblies
+
+        //// TODO: Handle output from CHANNEL_TO_FILE
+
     }
 
 
@@ -234,6 +240,7 @@ workflow FUNGAL_PHYLO {
     //     LOCAL_GENOMES (
     //         ch_genomes_local_input
     //     )
+    //      ch_genomes_local = LOCAL_GENOMES.out
     // }
 
 
@@ -271,19 +278,22 @@ workflow FUNGAL_PHYLO {
 
     //// extract sequences, align and build phylogenetic trees
     // concat ch_genomes_new, ch_genomes_internal and ch_genomes_external
-    // ch_genomes_all = 
-    //     ch_genomes_all
-    //     .concat ( ch_genomes_new )
-    //     .concat ( ch_genomes_local )
-    //     .concat ( ch_genomes_repository )
+    ch_genomes_all = 
+        ch_genomes_all
+        .concat ( ch_genomes_new )
+        .concat ( ch_genomes_local )
+        .concat ( ch_genomes_repository )
 
-    // ch_genomes_all .view()
+    
 
-    // PHYLOGENOMICS (
-    //     // ch_genomes_all
-    //     // ch_custom_markers
-    //     // // channel of .tsv metadata
-    // )
+    //// run PHYLOGENOMICS subworkflow
+    if ( params.run_phylogenomics ) {
+        PHYLOGENOMICS (
+            ch_genomes_all, 
+            ch_custom_markers, 
+            ch_genomes_metadata
+        )
+    }
 
     // /* 
     // NOTE: UFCG_PROFILE requires all assemblies be placed in a single directory, ideally with a metadata .tsv containing the following:

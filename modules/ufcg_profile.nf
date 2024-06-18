@@ -1,13 +1,14 @@
 process UFCG_PROFILE {
     def module_name = "ufcg_profile"
     tag "$sample"
-    label "very_high"
+    label "high"
 
     input:
     tuple val(sample), path(scaffolds)
 
     output:
     tuple val(sample), path("${sample}.ucg"), emit: ucg
+    val(true), emit: ready_signal
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

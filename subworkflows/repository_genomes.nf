@@ -111,7 +111,7 @@ workflow REPOSITORY_GENOMES {
     //// format output channel as [ accession, scaffolds ]
     ch_assemblies_meta
         .map { accession, label, taxon_name, taxid, genome -> [ accession, genome ] }
-        .tap { assembly_seq_genomes_repository }
+        .tap { out_assemblies }
         .map { accession, genome ->
             [ accession, "$projectDir/assets/NO_FILE1", "$projectDir/assets/NO_FILE2", "$projectDir/assets/NO_FILE3", genome ]
         }
@@ -125,7 +125,7 @@ workflow REPOSITORY_GENOMES {
 
     emit:
     
-    assembly_seq_genomes_repository
+    out_assemblies
     // assembly_report_genomes_repository = FIND_ASSEMBLIES_GROUP.out.tsv
     quast_report_genomes_repository = QUAST_REPOSITORY.out.report_tsv
     quast_plot_genomes_repository = QUAST_REPOSITORY.out.nx_plot

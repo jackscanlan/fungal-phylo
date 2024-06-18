@@ -25,6 +25,4 @@ shifter \
     -t $2 \
     -a nucleotide 
 
-### current version of ufcg (v1.0.5) has a bug where IGTREE doesn't work if input msa is not sufficently unique
-### see here: https://github.com/steineggerlab/ufcg/issues/21
-### as such, need to use RAxML for now
+
