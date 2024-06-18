@@ -6,29 +6,41 @@ set -u
 # $2 = sample
 # $3 = fwd_reads (one or more paths for fwd reads)
 # $4 = rev_reads (one or more paths for rev reads)
-# $5 = unpaired_reads (one path)
-# $6 = threads
+# $5 = merged reads
+# $6 = unpaired_reads (one path)
+# $7 = threads
 
 module load SPAdes/3.15.5-GCC-12.3.0
 
-## only use unpaired reads if they exist
-if [[ -z $(grep '[^[:space:]]' $5) ]]; then
-    # unpaired reads file is empty or contains only whitespace
+## only use merged and/or unpaired reads if they exist
+# if merged and unpaired is empty
+if [[ -z $(grep '[^[:space:]]' $5) && -z $(grep '[^[:space:]]' $6) ]]; then
     spades.py \
         -1 $3 \
         -2 $4 \
-        --threads $6 \
+        --threads $7 \
         --memory 550 \
         --only-assembler \
         --careful \
         -o .
-else
-    # unpaired reads file is not empty
+# if only merged is empty
+elif [[ -z $(grep '[^[:space:]]' $5) ]]; then
     spades.py \
         -1 $3 \
         -2 $4 \
-        -s $5 \
-        --threads $6 \
+        -s $6 \
+        --threads $7 \
+        --memory 550 \
+        --only-assembler \
+        --careful \
+        -o .
+# if only unpaired is empty
+else 
+    spades.py \
+        -1 $3 \
+        -2 $4 \
+        --merged $5 \
+        --threads $7 \
         --memory 550 \
         --only-assembler \
         --careful \

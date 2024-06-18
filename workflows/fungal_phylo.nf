@@ -245,9 +245,9 @@ workflow FUNGAL_PHYLO {
 
 
     //// assemble new genomes 
-    if ( ch_genome_reads ) { // only assemble genomes if ch_genome_reads is not empty
+    if ( ch_samples_new ) { // only assemble genomes if ch_samples_new is not empty
         GENOME_ASSEMBLY ( 
-            ch_genome_reads 
+            ch_samples_new 
         )
     }
 
@@ -256,7 +256,8 @@ workflow FUNGAL_PHYLO {
         ch_genomes_new
         .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
 
-
+    
+    
     // //// annotate new genomes
     // if ( ch_genomes_new ) {
     //     GENOME_ANNOTATION (
@@ -284,7 +285,7 @@ workflow FUNGAL_PHYLO {
         .concat ( ch_genomes_local )
         .concat ( ch_genomes_repository )
 
-    
+    ch_genomes_all .view()
 
     //// run PHYLOGENOMICS subworkflow
     if ( params.run_phylogenomics ) {

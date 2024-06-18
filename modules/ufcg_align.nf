@@ -2,6 +2,7 @@ process UFCG_ALIGN {
     def module_name = "ufcg_align"
     tag "Whole pipeline"
     label "very_high" 
+    cache false
 
     input:
     val(ready)

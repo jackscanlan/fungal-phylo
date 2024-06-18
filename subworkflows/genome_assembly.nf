@@ -40,7 +40,7 @@ workflow GENOME_ASSEMBLY {
     //// join error-corrected reads with the cleaned assembly scaffolds
     ERROR_CORRECTION.out.reads 
         .join ( CLEAN_ASSEMBLY.out.scaffolds, by: 0 ) 
-        .set { ch_quast_new_input } // card: sample, fwd_reads, rev_reads, unpaired_reads, scaffolds
+        .set { ch_quast_new_input } // card: sample, fwd_reads, rev_reads, merged_reads, unpaired_reads, scaffolds
 
     //// assess assembly quality
     QUAST_NEW ( ch_quast_new_input, "new" )

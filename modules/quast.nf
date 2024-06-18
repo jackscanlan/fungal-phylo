@@ -4,7 +4,7 @@ process QUAST {
     label "high"
 
     input:
-    tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads), path(scaffolds)
+    tuple val(sample), path(fwd_reads), path(rev_reads), path(merged_reads), path(unpaired_reads), path(scaffolds)
     val(genome_type) // must be "new" or "old"
 
     output:
@@ -26,6 +26,7 @@ process QUAST {
         ${sample} \
         ${fwd_reads} \
         ${rev_reads} \
+        ${merged_reads} \
         ${unpaired_reads} \
         ${scaffolds} \
         ${task.cpus} \

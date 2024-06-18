@@ -28,42 +28,36 @@ else
     spades.py \
         -1 $3 \
         -2 $4 \
-        -s $5 \
+        --merged $5 \
         --threads $6 \
         --memory 480 \
         --only-error-correction \
         -o .
 fi 
 
-# output is in "corrected" dir in work directory
-# for merged + unmerged paired input, you'll get four output files:
-# - "${2}_merged.fastq.00.0_1.cor.fastq.gz"
-# - "${2}_unmerged_R_unpaired.00.0_1.cor.fastq.gz"
-# - "${2}_unmerged_R1.fastq.00.0_0.cor.fastq.gz"
-# - "${2}_unmerged_R2.fastq.00.0_0.cor.fastq.gz"
-# first and second can be concantenated to produce a single unpaired output file
-
-## concatenate unpaired output files
+# define output files that only sometimes get created
 OUT_MERGED="./corrected/${2}_merged.fastq.00.0_1.cor.fastq.gz"
-OUT_UNPAIRED="./corrected/${2}_unmerged_R_unpaired.00.0_1.cor.fastq.gz"
+OUT_UNPAIRED0="./corrected/${2}_unmerged_R_unpaired.00.0_0.cor.fastq.gz"
+OUT_UNPAIRED1="./corrected/${2}_unmerged_R_unpaired.00.0_1.cor.fastq.gz"
 
-# if both files exist, concatenate them
-if [[ -f $OUT_MERGED && -f $OUT_UNPAIRED ]]; then
-    cat $OUT_MERGED $OUT_UNPAIRED > ${2}_single.cor.fastq.gz
-# if only merged file exists, create copy with output name
-elif [[ -f $OUT_MERGED ]]; then
-    cp $OUT_MERGED ${2}_single.cor.fastq.gz 
-# if only unpaired file exists, create copy with output name
-elif [[ -f $OUT_UNPAIRED ]]; then
-    cp $OUT_UNPAIRED ${2}_single.cor.fastq.gz 
-else 
-    echo "Cannot find expected unpaired read files after error correction for sample ${2}!"
-    exit 1
+# if any don't exist, create them with 'touch'
+if [[ ! -f $OUT_MERGED ]]; then
+    touch $OUT_MERGED
 fi
+if [[ ! -f $OUT_UNPAIRED0 ]]; then
+    touch $OUT_UNPAIRED0
+fi
+if [[ ! -f $OUT_UNPAIRED1 ]]; then
+    touch $OUT_UNPAIRED1
+fi
+
+# concatenate unpaired files
+cat $OUT_UNPAIRED0 $OUT_UNPAIRED1 > ${2}_unpaired.cor.fastq.gz
 
 # copy and rename paired output files
 cp ./corrected/${2}_unmerged_R1.fastq.00.0_0.cor.fastq.gz ${2}_R1.cor.fastq.gz 
 cp ./corrected/${2}_unmerged_R2.fastq.00.0_0.cor.fastq.gz ${2}_R2.cor.fastq.gz 
+cp $OUT_MERGED ${2}_merged.cor.fastq.gz
 
 
 

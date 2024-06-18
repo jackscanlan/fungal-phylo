@@ -4,7 +4,7 @@ process ASSEMBLY {
     label "very_high" 
 
     input:
-    tuple val(sample), path(fwd_reads), path(rev_reads), path(unpaired_reads)
+    tuple val(sample), path(fwd_reads), path(rev_reads), path(merged_reads), path(unpaired_reads)
 
     output:
     tuple val(sample), path("*_scaffolds.fasta"),       emit: scaffolds
@@ -25,6 +25,7 @@ process ASSEMBLY {
         ${sample} \
         ${fwd_reads} \
         ${rev_reads} \
+        ${merged_reads} \
         ${unpaired_reads} \
         ${task.cpus}
     

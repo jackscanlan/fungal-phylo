@@ -113,7 +113,7 @@ workflow REPOSITORY_GENOMES {
         .map { accession, label, taxon_name, taxid, genome -> [ accession, genome ] }
         .tap { out_assemblies }
         .map { accession, genome ->
-            [ accession, "$projectDir/assets/NO_FILE1", "$projectDir/assets/NO_FILE2", "$projectDir/assets/NO_FILE3", genome ]
+            [ accession, "$projectDir/assets/NO_FILE1", "$projectDir/assets/NO_FILE2", "$projectDir/assets/NO_FILE3", "$projectDir/assets/NO_FILE4", genome ]
         }
         .set { ch_genomes_repository }
 
