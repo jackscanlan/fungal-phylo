@@ -4,7 +4,7 @@
 
 
 //// modules to import
-include { COMBINE_TSV                                           } from '../modules/combine_tsv'
+include { CHANNEL_TO_FILE                                           } from '../modules/channel_to_file'
 include { FIND_ASSEMBLIES_SINGLE                                } from '../modules/find_assemblies_single'
 include { FIND_ASSEMBLIES_GROUP                                 } from '../modules/find_assemblies_group'
 include { QUAST as QUAST_REPOSITORY                             } from '../modules/quast'
@@ -25,7 +25,7 @@ workflow REPOSITORY_GENOMES {
     ch_genomes_found_group      = Channel.empty()
     ch_assemblies_single_tsvs    = Channel.empty()
     ch_assemblies_group_tsvs    = Channel.empty()
-    ch_tsvs                     - Channel.empty()
+    ch_assemblies_meta                     = Channel.empty()
 
     //// get all genome assemblies specified in samplesheet
     if ( samples ) {
@@ -46,7 +46,11 @@ workflow REPOSITORY_GENOMES {
 
         //// rename output .tsvs from FIND_ASSEMBLIES_SINGLE
         FIND_ASSEMBLIES_SINGLE.out.tsv
-            .set { ch_assemblies_single_tsvs }
+            .splitCsv ( header: ['label','accession','taxon_name','taxid'], skip: 1, sep: "\t" )
+            .map { row ->
+                [ row.accession, row.label, row.taxon_name, row.taxid ] }
+            .join ( ch_genomes_found_single, by: 0 )
+            .set { ch_assemblies_single_meta }
         
     }
 
@@ -69,19 +73,33 @@ workflow REPOSITORY_GENOMES {
 
         //// rename output .tsvs from FIND_ASSEMBLIES_GROUP
         FIND_ASSEMBLIES_GROUP.out.tsv
-            .set { ch_assemblies_group_tsvs }
-        
-
+            .splitCsv ( header: ['label','accession','taxon_name','taxid'], skip: 1, sep: "\t" )
+            .map { row ->
+                [ row.accession, row.label, row.taxon_name, row.taxid ] }
+            .join ( ch_genomes_found_group, by: 0 )
+            .set { ch_assemblies_group_meta }
     }
 
-    //// combine .tsvs from group and single assemblies, removing duplicates
-    ch_tsvs
-        .concat ( ch_assemblies_single_tsvs )
-        .concat ( ch_assemblies_group_tsvs )
-        .collect()
-        .set { ch_tsvs }
+    //// combine group and single assemblies with metadata, removing duplicates
+    ch_assemblies_meta
+        .concat ( ch_assemblies_single_meta )
+        .concat ( ch_assemblies_group_meta )
+        .groupTuple ( by: 0 )
+        .map { accession, label, taxon_name, taxid, genome ->
+            [ accession, label[0], taxon_name[0], taxid[0], genome[0] ] }
+        .set { ch_assemblies_meta }
     
-    // COMBINE_TSV ( ch_tsvs )
+    //// save meta channel as file
+    ch_assemblies_meta
+        .collect ( flat: false )
+        .set { ch_assemblies_meta_fileinput }
+
+    CHANNEL_TO_FILE ( 
+        ch_assemblies_meta_fileinput, 
+        "csv", 
+        "accession,label,taxon_name,taxid,genome" 
+    )
+    
 
     //// combine ch_genomes_found_single and ch_genomes_found_group, removing duplicates
     ch_genomes_found_single
@@ -91,19 +109,11 @@ workflow REPOSITORY_GENOMES {
     // ch_genomes_found.count().view { "$it total genomes before deduplication" }
 
     //// format output channel as [ accession, scaffolds ]
-    ch_genomes_found
-        // wait until all items are emitted from the source channels, then collect in nested format
-        .collect ( flat: false ) 
-        // emit individual items again
-        .flatMap() 
-        // group files by accession, if there are duplicates
-        .groupTuple ( by:0 )
-        // pare down duplicates to one
-        .map { accession, files ->
-            [ accession, files[0] ] }
+    ch_assemblies_meta
+        .map { accession, label, taxon_name, taxid, genome -> [ accession, genome ] }
         .tap { assembly_seq_genomes_repository }
-        .map { accession, file ->
-            [ accession, "$projectDir/assets/NO_FILE1", "$projectDir/assets/NO_FILE2", "$projectDir/assets/NO_FILE3", file ]
+        .map { accession, genome ->
+            [ accession, "$projectDir/assets/NO_FILE1", "$projectDir/assets/NO_FILE2", "$projectDir/assets/NO_FILE3", genome ]
         }
         .set { ch_genomes_repository }
 
