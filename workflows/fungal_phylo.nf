@@ -245,16 +245,16 @@ workflow FUNGAL_PHYLO {
 
 
     //// assemble new genomes 
-    // if ( ch_genome_reads ) { // only assemble genomes if ch_genome_reads is not empty
-    //     GENOME_ASSEMBLY ( 
-    //         ch_genome_reads 
-    //     )
-    // }
+    if ( ch_genome_reads ) { // only assemble genomes if ch_genome_reads is not empty
+        GENOME_ASSEMBLY ( 
+            ch_genome_reads 
+        )
+    }
 
-    // concat output with empty ch_genomes_new
-    // ch_genomes_new = 
-    //     ch_genomes_new
-    //     .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
+    //// concat output with empty ch_genomes_new
+    ch_genomes_new = 
+        ch_genomes_new
+        .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
 
 
     // //// annotate new genomes
@@ -294,31 +294,6 @@ workflow FUNGAL_PHYLO {
             ch_genomes_metadata
         )
     }
-
-    // /* 
-    // NOTE: UFCG_PROFILE requires all assemblies be placed in a single directory, ideally with a metadata .tsv containing the following:
-    // - 'Filename': name of the .fasta of the assembly
-    // - 'Label': ID of the strain etc. 
-    // - 'Accession': NCBI accession code for the assembly (make this 'NA' for new assemblies)
-    
-    // This .tsv file is specified with '-m' on the command line.
-    // If .tsv metadata is not provided, I think it assumes all the files in the directory it is pointed to are .fasta and will try to extract profiles.
-    // */
-
-
-    //// make UFCG profile from single genome assembly
-    // UFCG_PROFILE ( ch_ufcg_profile_input )
-
-    // UFCG_PROFILE_OLD.out
-    //     .concat ( UFCG_PROFILE.out )
-    //     .collect ()
-    //     .set { ch_ufcg_tree_input }
-
-    // //// combine .ucg profile files into a single channel
-    // // UFCG_PROFILE.out.ucg
-    // //     .
-
-    // UFCG_ALIGN ( )
 
     // /*
     // ** Phylogenetic modules **

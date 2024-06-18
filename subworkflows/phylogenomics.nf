@@ -6,6 +6,8 @@
 //// modules to import
 include { UFCG_PROFILE                                     } from '../modules/ufcg_profile'
 include { UFCG_ALIGN                                     } from '../modules/ufcg_align'
+include { BUILD_TREE                                     } from '../modules/build_tree'
+
 
 
 workflow PHYLOGENOMICS {
@@ -37,7 +39,8 @@ workflow PHYLOGENOMICS {
     //// run ufcg align to align sequences from profiles
     UFCG_ALIGN ( ch_ready )
 
-    UFCG_ALIGN.out.alignment_dir .view()
+    //// build phylogenetic tree
+    BUILD_TREE ( UFCG_ALIGN.out.alignment_dir )
 
     emit: 
 
