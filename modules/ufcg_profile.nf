@@ -1,14 +1,15 @@
 process UFCG_PROFILE {
     def module_name = "ufcg_profile"
     tag "$sample"
-    label "high"
-    cache false
+    label "medium"
 
     input:
     tuple val(sample), path(scaffolds)
+    path(metadata)
+    path(profile_directory)
 
     output:
-    tuple val(sample), path("${sample}.ucg"), emit: ucg
+    // path("*.ucg"), emit: ucg
     val(true), emit: ready_signal
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
@@ -25,6 +26,8 @@ process UFCG_PROFILE {
         ${projectDir} \
         ${sample} \
         ${scaffolds} \
+        ${metadata} \
+        ${profile_directory} \
         ${task.cpus}
     
     """

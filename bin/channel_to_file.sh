@@ -6,6 +6,7 @@ set -u
 # $2 = channel_data
 # $3 = file_type
 # $4 = header
+# $5 = file_name (without extension)
 
 
 ### $2 (channel_data) is a nested groovy list: each element is in [] and the whole list is in [], items separated by comma and quoted in ''
@@ -16,7 +17,7 @@ set -u
 
 if [[ $3 == "csv" ]]; then
 
-    HEADER=${4}
+    HEADER="${4}"
 
     # remove leading '[[' and trailing ']]', convert '], [' to new lines, remove whitespace around commas
     echo $2 \
@@ -27,12 +28,12 @@ if [[ $3 == "csv" ]]; then
         > body.${3}
 
     # append header
-    echo $HEADER | cat - body.${3} > out.${3}
+    echo "$HEADER" | cat - body.${3} > ${5}.${3}
 
 elif [[ $3 == "tsv" ]]; then
 
     # convert commas in header to \t
-    HEADER=$( echo $4 | sed 's/,/\t/g' )
+    HEADER=$( echo "${4}" | sed 's/,/\t/g' )
 
     # remove leading '[[' and trailing ']]', convert '], [' to new lines, remove whitespace around commas then conver to tabs
     echo $2 \
@@ -43,7 +44,7 @@ elif [[ $3 == "tsv" ]]; then
         > body.${3}
 
     # append header
-    echo "$HEADER" | cat - body.${3} > out.${3}
+    echo "$HEADER" | cat - body.${3} > ${5}.${3}
 
 else 
     echo "file_type was ${3}, but must be 'csv' or 'tsv'"

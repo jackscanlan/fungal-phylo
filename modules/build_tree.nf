@@ -1,8 +1,7 @@
 process BUILD_TREE {
     def module_name = "build_tree"
     tag "Whole pipeline"
-    label "very_high" 
-    cache false
+    label "high" 
 
     input:
     path(alignment_dir)
@@ -11,7 +10,7 @@ process BUILD_TREE {
     path("*.treefile")
     path("*.iqtree")
     path("*.log")
-    path("*.tree")
+    path("*.tree"), emit: trees
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

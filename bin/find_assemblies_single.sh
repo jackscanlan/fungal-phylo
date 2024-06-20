@@ -53,13 +53,13 @@ shifter \
     --image=ddev/ddev-utilities:latest \
     -- \
 	jq -r \
-    '[.organism.organismName, .accession, .assemblyInfo.assemblyName, .organism.taxId] | @tsv' \
+    '[.organism.organismName, .accession, .organism.organismName, .assemblyInfo.assemblyName, .organism.infraspecificNames.strain, .organism.taxId, .assemblyStats.contigN50, .assemblyStats.contigL50 ] | @tsv' \
 	./genome_${SAMPLE}/ncbi_dataset/data/assembly_data_report.jsonl \
     > genome_${SAMPLE}_body.tsv
 
 
 # add headers to .tsv
-HEADER="Label\tAccession\tTaxon name\tTaxid"
+HEADER="Label\tAccession\tTaxon name\tNCBI name\tStrain name\tTaxonomy\tcontigN50\tcontigL50"
 echo -e "$HEADER" | cat - genome_${SAMPLE}_body.tsv > genome_${SAMPLE}.tsv
 
 # pull genome out of directory structure

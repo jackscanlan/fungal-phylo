@@ -11,6 +11,7 @@ process FIND_ASSEMBLIES_SINGLE {
     path("genome_${sample}.tsv"), emit: tsv
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
+    publishDir "${projectDir}/output/genomes", mode: 'copy', pattern: "*.fna"
 
     // when: 
 

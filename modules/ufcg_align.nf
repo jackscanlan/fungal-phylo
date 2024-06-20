@@ -1,10 +1,10 @@
 process UFCG_ALIGN {
     def module_name = "ufcg_align"
     tag "Whole pipeline"
-    label "very_high" 
-    cache false
-
+    label "high" 
+    
     input:
+    path(profile_directory)
     val(ready)
 
     output:
@@ -23,6 +23,7 @@ process UFCG_ALIGN {
     ### run module code
     bash ${module_name}.sh \
         ${projectDir} \
+        ${profile_directory} \
         ${task.cpus}
     
     """

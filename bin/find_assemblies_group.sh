@@ -46,12 +46,23 @@ fi
 
 ## use jq to extract relevant fields
 ### TODO: add N50 and assembly level in there to compare assemblies
+### list of required elements:
+# - 'Filename' (can get from file, don't extract)
+# - 'Label' (.organism.organismName)
+# - 'Accession' (.accession)
+# - 'Taxon name' (.organism.organismName)
+# - 'NCBI name' (.assemblyInfo.assemblyName)
+# - 'Strain name' (.organism.infraspecificNames.strain)
+# - 'Taxonomy' (probably can't get this)
+# - contigN50 (.assemblyStats.contigN50)
+# - contigL50 (.assemblyStats.contigL50)
+
 # create .tsv
 shifter \
     --image=ddev/ddev-utilities:latest \
     -- \
 	jq -r \
-    '[.organism.organismName, .accession, .assemblyInfo.assemblyName, .organism.taxId] | @tsv' \
+    '[.organism.organismName, .accession, .organism.organismName, .assemblyInfo.assemblyName, .organism.infraspecificNames.strain, .organism.taxId, .assemblyStats.contigN50, .assemblyStats.contigL50 ] | @tsv' \
 	./genomes_${2}/ncbi_dataset/data/assembly_data_report.jsonl \
     > genomes_${2}_body.tsv
 
@@ -68,7 +79,7 @@ shifter \
 # if they do, subset to only keep GCF
 
 # add headers to .tsv
-HEADER="Label\tAccession\tTaxon name\tTaxid"
+HEADER="Label\tAccession\tTaxon name\tNCBI name\tStrain name\tTaxonomy\tcontigN50\tcontigL50"
 echo -e "$HEADER" | cat - genomes_${2}_body.tsv > genomes_${2}.all.tsv
 
 

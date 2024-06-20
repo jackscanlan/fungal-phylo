@@ -3,7 +3,8 @@ set -e
 set -u
 ## args are the following:
 # $1 = projectDir 
-# $2 = threads
+# $2 = profile_directory
+# $3 = threads
 
 module load shifter
 
@@ -20,9 +21,10 @@ shifter \
     --image=endix1029/ufcg:v1.0.5 \
     -- \
     ufcg align \
-    -i ${1}/output/modules/ufcg_profile \
+    -i $2 \
     -o . \
-    -t $2 \
+    -l label,acc \
+    -t $3 \
     -a nucleotide 
 
 

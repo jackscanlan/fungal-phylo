@@ -8,9 +8,10 @@ process CHANNEL_TO_FILE {
     val(channel_data)
     val(file_type)
     val(header)
+    val(file_name)
 
     output:
-    path("out.*")
+    path("${file_name}.${file_type}"), emit: metadata
     
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
@@ -27,7 +28,8 @@ process CHANNEL_TO_FILE {
         ${projectDir} \
         "${channel_data}" \
         ${file_type} \
-        ${header}
+        "${header}" \
+        ${file_name}
     
     """
 

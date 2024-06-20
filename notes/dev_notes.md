@@ -49,7 +49,45 @@ Testing split samplesheet:
     # with multi taxid (overlap)
     nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 5530,5529
 
+Testing datasets and jq:
 
+    mkdir -p ~/jq_test && cd ~/jq_test
+
+    module load shifter
+
+    shifter \
+        --image=staphb/ncbi-datasets:16.15.0 \
+        -- \
+        datasets \
+        download \
+        genome \
+        taxon 5529 \
+        --filename genomes.zip \
+        --exclude-atypical \
+        --include genome \
+        --assembly-source GenBank
+
+    # unzip
+    unzip genomes.zip
+
+    # data is in jsonl file here: 'ncbi_dataset/data/assembly_data_report.jsonl'
+
+    # use jq
+    shifter \
+        --image=ddev/ddev-utilities:latest \
+        -- \
+        jq . \
+        ncbi_dataset/data/assembly_data_report.jsonl \
+        > assembly_data_report.txt
+
+    # pull data
+    shifter \
+        --image=ddev/ddev-utilities:latest \
+        -- \
+        jq -r \
+        '[.organism.organismName, .accession, .organism.organismName, .assemblyInfo.assemblyName, .organism.infraspecificNames.strain, .organism.taxId, .assemblyStats.contigN50, .assemblyStats.contigL50 ] | @tsv' \
+        ncbi_dataset/data/assembly_data_report.jsonl \
+        > body.tsv
 
 
 Total data:

@@ -20,6 +20,12 @@ workflow PHYLOGENOMICS {
 
     main:
 
+    //// define and make .ucg folder
+    profile_directory = file("$projectDir/output/ufcg_profiles")
+    profile_directory.mkdirs()
+
+    /// convert genomes_metadata to value channel
+    genomes_metadata = genomes_metadata.first()
 
     //// conditional on presence/absense of custom marker input channel
     if ( custom_markers ) {
@@ -27,7 +33,8 @@ workflow PHYLOGENOMICS {
     }
 
     //// run ufcg profile to extract profiles 
-    UFCG_PROFILE ( genomes )
+    UFCG_PROFILE ( genomes, genomes_metadata, profile_directory )
+    // UFCG_PROFILE ( genomes_metadata )
 
     //// produce ready signal for UFCG_ALIGN
     UFCG_PROFILE.out.ready_signal
@@ -37,14 +44,14 @@ workflow PHYLOGENOMICS {
         .set { ch_ready }
 
     //// run ufcg align to align sequences from profiles
-    UFCG_ALIGN ( ch_ready )
+    UFCG_ALIGN ( profile_directory, ch_ready )
 
     //// build phylogenetic tree
     BUILD_TREE ( UFCG_ALIGN.out.alignment_dir )
 
     emit: 
 
-    UFCG_PROFILE.out.ucg
+    BUILD_TREE.out.trees
 
 
 

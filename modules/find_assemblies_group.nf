@@ -12,6 +12,7 @@ process FIND_ASSEMBLIES_GROUP {
     path("genomes_${ncbi_taxid}.tsv"), emit: tsv
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
+    publishDir "${projectDir}/output/genomes", mode: 'copy', pattern: "*.fna"
 
     // when: 
 

@@ -50,8 +50,9 @@ if (params.help) {
 
 */
 
-
-
+//// make genome folder
+genome_directory = file("$projectDir/output/genomes").mkdirs()
+metadata_directory = file("$projectDir/output/metadata").mkdirs()
 
 
 /*
@@ -149,6 +150,7 @@ workflow FUNGAL_PHYLO {
     ch_genomes_new              = Channel.empty()
     ch_ncbi_taxid               = Channel.empty()
     ch_genomes_repository       = Channel.empty()
+    ch_repository_metadata      = Channel.empty()
     ch_genomes_local            = Channel.empty()
     ch_genomes_all              = Channel.empty()
     ch_custom_markers           = Channel.empty()
@@ -230,6 +232,12 @@ workflow FUNGAL_PHYLO {
 
         ch_genomes_repository = REPOSITORY_GENOMES.out.out_assemblies
 
+        ch_repository_metadata
+            .concat ( REPOSITORY_GENOMES.out.metadata )
+            // .splitCsv( header:false, skip:1, sep: "\t")
+            // .view()
+            .set { ch_repository_metadata }
+
         //// TODO: Handle output from CHANNEL_TO_FILE
 
     }
@@ -244,19 +252,18 @@ workflow FUNGAL_PHYLO {
     // }
 
 
-    //// assemble new genomes 
-    if ( ch_samples_new ) { // only assemble genomes if ch_samples_new is not empty
-        GENOME_ASSEMBLY ( 
-            ch_samples_new 
-        )
-    }
+    // //// assemble new genomes 
+    // if ( ch_samples_new ) { // only assemble genomes if ch_samples_new is not empty
+    //     GENOME_ASSEMBLY ( 
+    //         ch_samples_new 
+    //     )
+    // }
 
-    //// concat output with empty ch_genomes_new
-    ch_genomes_new = 
-        ch_genomes_new
-        .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
+    // //// concat output with empty ch_genomes_new
+    // ch_genomes_new = 
+    //     ch_genomes_new
+    //     .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
 
-    
     
     // //// annotate new genomes
     // if ( ch_genomes_new ) {
@@ -277,6 +284,7 @@ workflow FUNGAL_PHYLO {
     // concat CUSTOM_MARKERS output with empty ch_custom_markers channel
 
 
+
     //// extract sequences, align and build phylogenetic trees
     // concat ch_genomes_new, ch_genomes_internal and ch_genomes_external
     ch_genomes_all = 
@@ -284,9 +292,13 @@ workflow FUNGAL_PHYLO {
         .concat ( ch_genomes_new )
         .concat ( ch_genomes_local )
         .concat ( ch_genomes_repository )
+    
+    // combine metadata .tsvs
+    ch_genomes_metadata
+        .concat ( ch_repository_metadata )
+        .set { ch_genomes_metadata }
 
-    ch_genomes_all .view()
-
+        
     //// run PHYLOGENOMICS subworkflow
     if ( params.run_phylogenomics ) {
         PHYLOGENOMICS (
@@ -295,6 +307,7 @@ workflow FUNGAL_PHYLO {
             ch_genomes_metadata
         )
     }
+
 
     // /*
     // ** Phylogenetic modules **
