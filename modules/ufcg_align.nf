@@ -1,8 +1,8 @@
 process UFCG_ALIGN {
     def module_name = "ufcg_align"
     tag "Whole pipeline"
-    label "high" 
-    
+    label "medium" 
+
     input:
     path(profile_directory)
     val(ready)

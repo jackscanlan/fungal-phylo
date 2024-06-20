@@ -9,7 +9,7 @@ process UFCG_PROFILE {
     path(profile_directory)
 
     output:
-    // path("*.ucg"), emit: ucg
+    path("*.ucg"), emit: ucg
     val(true), emit: ready_signal
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'

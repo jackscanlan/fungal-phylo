@@ -11,3 +11,4 @@ output/
 .nextflow/
 *.log.[0-9]
 .nextflow.pid
+*.out

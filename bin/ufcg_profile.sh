@@ -19,30 +19,22 @@ else
     shifterimg pull docker:endix1029/ufcg:v1.0.5
 fi
 
-# run ufcg
-# shifter \
-#     --image=endix1029/ufcg:v1.0.5 \
-#     -- \
-#     ufcg profile \
-#     --info ${3},${2},${2} \
-#     -i ${3} \
-#     -o . \
-#     -t $5 \
-#     --set PRO \
-#     -f 
-
 # convert symlink to absolute path because ufcg can't handle symlink for metadata file for some reason
 META_PATH=$(readlink ${4} -fn)
 
+# run ufcg profile
 shifter \
     --image=endix1029/ufcg:v1.0.5 \
     -- \
     ufcg profile \
     --input $3 \
     --metadata $META_PATH \
-    --output $5 \
+    --output . \
     -t $6 \
     --set PRO \
     -f \
     --nocolor \
     -v
+
+# copy final file to output dir
+cp *.ucg $5

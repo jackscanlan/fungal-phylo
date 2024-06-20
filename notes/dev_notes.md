@@ -49,6 +49,9 @@ Testing split samplesheet:
     # with multi taxid (overlap)
     nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 5530,5529
 
+    # Clavicipitaceae
+    nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 34397 
+
 Testing datasets and jq:
 
     mkdir -p ~/jq_test && cd ~/jq_test
