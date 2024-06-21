@@ -80,7 +80,7 @@ metadata_directory = file("$projectDir/output/metadata").mkdirs()
 include { REPOSITORY_GENOMES                                     } from '../subworkflows/repository_genomes'
 // include { GENOME_ANNOTATION                                     } from '../subworkflows/genome_annotation'
 include { GENOME_ASSEMBLY                                     } from '../subworkflows/genome_assembly'
-// include { LOCAL_GENOMES                                     } from '../subworkflows/local_genomes'
+include { LOCAL_GENOMES                                     } from '../subworkflows/local_genomes'
 include { PHYLOGENOMICS                                     } from '../subworkflows/phylogenomics'
 // include { VISUALISATION                                     } from '../subworkflows/visualisation'
 
@@ -89,6 +89,10 @@ include { PHYLOGENOMICS                                     } from '../subworkfl
 
 
 // modules
+include { CHANNEL_TO_FILE as META_TO_TSV                                } from '../modules/channel_to_file'
+
+
+
 include { FIND_ASSEMBLIES_GROUP                                     } from '../modules/find_assemblies_group'
 include { FIND_ASSEMBLIES_SINGLE                                    } from '../modules/find_assemblies_single'
 include { COMBINE_LANES                             } from '../modules/combine_lanes'
@@ -144,17 +148,19 @@ workflow FUNGAL_PHYLO {
     */
 
     //// make empty channels
-    ch_samples_new              = Channel.empty()
-    ch_samples_local            = Channel.empty()
-    ch_samples_repository       = Channel.empty()
-    ch_genomes_new              = Channel.empty()
-    ch_ncbi_taxid               = Channel.empty()
-    ch_genomes_repository       = Channel.empty()
-    ch_repository_metadata      = Channel.empty()
-    ch_genomes_local            = Channel.empty()
-    ch_genomes_all              = Channel.empty()
-    ch_custom_markers           = Channel.empty()
-    ch_genomes_metadata         = Channel.empty()
+    ch_samples_new                      = Channel.empty()
+    ch_samples_local                    = Channel.empty()
+    ch_samples_repository               = Channel.empty()
+    ch_genomes_new                      = Channel.empty()
+    ch_ncbi_taxid                       = Channel.empty()
+    ch_genomes_repository               = Channel.empty()
+    ch_meta_fileinput_new               = Channel.empty()
+    ch_meta_fileinput_local             = Channel.empty()
+    ch_meta_fileinput_repository        = Channel.empty()
+    ch_genomes_local                    = Channel.empty()
+    ch_genomes_all                      = Channel.empty()
+    ch_custom_markers                   = Channel.empty()
+    ch_meta_fileinput                   = Channel.empty()
 
 
     /*
@@ -187,7 +193,7 @@ workflow FUNGAL_PHYLO {
             // concatenate all values from columns/keys starting with 'rev' into a string delimited by commas
             def rev_reads = row.findAll { it.key.startsWith('rev') } .values() .join(",")
             // output tuple
-            [ row.sample, fwd_reads, rev_reads ]
+            [ row.sample, row.isolate, file(fwd_reads), file(rev_reads) ]
             }
         .concat ( ch_samples_new )
         .set { ch_samples_new }
@@ -197,7 +203,7 @@ workflow FUNGAL_PHYLO {
     /// populate ch_samples_local
     ch_samplesheet
         .filter { row -> row.type == "local" }  
-        .map { row -> [ row.sample, row.genome_file ]}
+        .map { row -> [ row.sample, row.isolate, file(row.genome_file) ]}
         .concat ( ch_samples_local )
         .set { ch_samples_local }
 
@@ -230,48 +236,55 @@ workflow FUNGAL_PHYLO {
             ch_samples_repository 
         )
 
-        ch_genomes_repository = REPOSITORY_GENOMES.out.out_assemblies
+        ch_genomes_repository = REPOSITORY_GENOMES.out.repo_assemblies
 
-        ch_repository_metadata
-            .concat ( REPOSITORY_GENOMES.out.metadata )
-            // .splitCsv( header:false, skip:1, sep: "\t")
-            // .view()
-            .set { ch_repository_metadata }
-
-        //// TODO: Handle output from CHANNEL_TO_FILE
+        ch_meta_fileinput_repository
+            .concat ( REPOSITORY_GENOMES.out.meta_fileinput )
+            .set { ch_meta_fileinput_repository }
 
     }
 
 
-    // //// process internal genomes
-    // if ( ch_genomes_local_input ) {
-    //     LOCAL_GENOMES (
-    //         ch_genomes_local_input
-    //     )
-    //      ch_genomes_local = LOCAL_GENOMES.out
-    // }
+    //// process internal genomes
+    if ( ch_samples_local ) {
+        LOCAL_GENOMES (
+            ch_samples_local
+        )
+        
+        ch_genomes_local
+            .concat ( LOCAL_GENOMES.out.local_assemblies )
+            .set { ch_genomes_local }
+        ch_meta_fileinput_local
+            .concat ( LOCAL_GENOMES.out.meta_fileinput )
+            .set { ch_meta_fileinput_local }
+    
+    }
 
 
-    // //// assemble new genomes 
-    // if ( ch_samples_new ) { // only assemble genomes if ch_samples_new is not empty
-    //     GENOME_ASSEMBLY ( 
-    //         ch_samples_new 
-    //     )
-    // }
+    //// assemble new genomes 
+    if ( ch_samples_new ) { // only assemble genomes if ch_samples_new is not empty
+        GENOME_ASSEMBLY ( 
+            ch_samples_new 
+        )
+    
+        ch_genomes_new
+            .concat ( GENOME_ASSEMBLY.out.new_assemblies )
+            .set { ch_genomes_new }
+        ch_meta_fileinput_new
+            .concat ( GENOME_ASSEMBLY.out.meta_fileinput )
+            .set { ch_meta_fileinput_new }
+    
+        // //// annotate new genomes
+        // if ( ch_genomes_new ) {
+        //     GENOME_ANNOTATION (
+        //         ch_genomes_new
+        //     )
+        // }
 
-    // //// concat output with empty ch_genomes_new
-    // ch_genomes_new = 
-    //     ch_genomes_new
-    //     .concat ( GENOME_ASSEMBLY.out.assembly_seq_genomes_new )
+    }
 
     
-    // //// annotate new genomes
-    // if ( ch_genomes_new ) {
-    //     GENOME_ANNOTATION (
-    //         ch_genomes_new
-    //     )
-    // }
-
+ 
 
 
     // //// produce custom marker profiles
@@ -287,24 +300,36 @@ workflow FUNGAL_PHYLO {
 
     //// extract sequences, align and build phylogenetic trees
     // concat ch_genomes_new, ch_genomes_internal and ch_genomes_external
-    ch_genomes_all = 
-        ch_genomes_all
+    ch_genomes_all
         .concat ( ch_genomes_new )
         .concat ( ch_genomes_local )
         .concat ( ch_genomes_repository )
-    
-    // combine metadata .tsvs
-    ch_genomes_metadata
-        .concat ( ch_repository_metadata )
-        .set { ch_genomes_metadata }
+        .set { ch_genomes_all }
 
-        
+    
+
+    //// combine metadata input channels
+    ch_meta_fileinput
+        .concat ( ch_meta_fileinput_new )
+        .concat ( ch_meta_fileinput_local )
+        .concat ( ch_meta_fileinput_repository )
+        .collect ( flat: false )
+        .set { ch_meta_fileinput }
+
+    //// comine metadata channels into TSV for ufcg
+    META_TO_TSV ( 
+        ch_meta_fileinput, 
+        "tsv", 
+        "filename,label,accession,taxon_name,ncbi_name,strain_name,taxonomy",
+        "repository_metadata"
+    )
+
     //// run PHYLOGENOMICS subworkflow
     if ( params.run_phylogenomics ) {
         PHYLOGENOMICS (
             ch_genomes_all, 
             ch_custom_markers, 
-            ch_genomes_metadata
+            META_TO_TSV.out.metadata
         )
     }
 

@@ -1,7 +1,7 @@
 process UFCG_PROFILE {
     def module_name = "ufcg_profile"
     tag "$sample"
-    label "medium"
+    label "high"
 
     input:
     tuple val(sample), path(scaffolds)

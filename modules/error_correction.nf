@@ -4,10 +4,10 @@ process ERROR_CORRECTION {
     label "very_high"
 
     input:
-    tuple val(sample), path(fwd_reads), path(rev_reads), path(merged_reads)
+    tuple val(sample), val(isolate), path(fwd_reads), path(rev_reads), path(merged_reads)
 
     output:   
-    tuple val(sample), path("*_R1.cor.fastq.gz"), path("*_R2.cor.fastq.gz"), path("*_merged.cor.fastq.gz"), path("*_unpaired.cor.fastq.gz"), emit: reads
+    tuple val(sample), val(isolate), path("*_R1.cor.fastq.gz"), path("*_R2.cor.fastq.gz"), path("*_merged.cor.fastq.gz"), path("*_unpaired.cor.fastq.gz"), emit: reads
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

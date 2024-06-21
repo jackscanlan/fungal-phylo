@@ -4,7 +4,7 @@
 
 
 //// modules to import
-include { CHANNEL_TO_FILE as META_TO_TSV                                } from '../modules/channel_to_file'
+// include { CHANNEL_TO_FILE as META_TO_TSV                                } from '../modules/channel_to_file'
 include { FIND_ASSEMBLIES_SINGLE                                } from '../modules/find_assemblies_single'
 include { FIND_ASSEMBLIES_GROUP                                 } from '../modules/find_assemblies_group'
 include { QUAST as QUAST_REPOSITORY                             } from '../modules/quast'
@@ -23,9 +23,9 @@ workflow REPOSITORY_GENOMES {
     //// define channels as empty
     ch_genomes_found_single     = Channel.empty()
     ch_genomes_found_group      = Channel.empty()
-    ch_assemblies_single_tsvs    = Channel.empty()
-    ch_assemblies_group_tsvs    = Channel.empty()
-    ch_assemblies_meta                     = Channel.empty()
+    ch_repo_single_tsvs    = Channel.empty()
+    ch_repo_group_tsvs    = Channel.empty()
+    ch_repo_meta_all                     = Channel.empty()
 
     //// get all genome assemblies specified in samplesheet
     if ( samples ) {
@@ -60,6 +60,7 @@ workflow REPOSITORY_GENOMES {
         ch_genomes_found_group
             .concat ( FIND_ASSEMBLIES_GROUP.out.genome )
             .flatten()
+            .tap {test_output }
             .map { file ->
                 // get file basename
                 def base = file.name.lastIndexOf('.').with {it != -1 ? file.name[0..<it] : file.name}
@@ -69,6 +70,10 @@ workflow REPOSITORY_GENOMES {
                 [ accession, file.name, file ]
             }
             .set { ch_genomes_found_group }
+
+        // test_output
+        //     .map { file -> file.getName() }
+        //     .view()
 
         //// rename output .tsvs from FIND_ASSEMBLIES_GROUP
         FIND_ASSEMBLIES_GROUP.out.tsv
@@ -82,21 +87,16 @@ workflow REPOSITORY_GENOMES {
 
 
     //// combine group and single assemblies with metadata, removing duplicates
-    ch_assemblies_meta
+    ch_repo_meta_all
         .concat ( ch_assemblies_single_meta )
         .concat ( ch_assemblies_group_meta )
         .groupTuple ( by: 0 )
         .map { accession, label, taxon_name, ncbi_name, strain_name, taxonomy, contigN50, contigL50, file_name, genome ->
             [ accession, label[0], taxon_name[0], ncbi_name[0], strain_name[0], taxonomy[0], contigN50[0], contigL50[0], file_name[0], genome[0] ] }
-        .set { ch_assemblies_meta }
+        .set { ch_repo_meta_all }
     
     //// save meta channel as file
-    //// full
-    // ch_assemblies_meta
-    //     .map { accession, label, taxon_name, ncbi_name, strain_name, taxonomy, contigN50, contigL50, file_name, genome ->
-    //         [ file_name, label, accession, taxon_name, ncbi_name, strain_name, taxonomy ] }
-    //     .collect ( flat: false )
-    //     .set { ch_assemblies_meta_fileinput }
+
 
     // META_TO_TSV ( 
     //     ch_assemblies_meta_fileinput, 
@@ -104,19 +104,18 @@ workflow REPOSITORY_GENOMES {
     //     "filename,label,accession,taxon_name,ncbi_name,strain_name,taxonomy",
     //     "repository_metadata"
     // )
-    //// simple
-    ch_assemblies_meta
+    ch_repo_meta_all
         .map { accession, label, taxon_name, ncbi_name, strain_name, taxonomy, contigN50, contigL50, file_name, genome ->
             [ file_name, label, accession, taxon_name, ncbi_name, strain_name, taxonomy ] }
-        .collect ( flat: false )
-        .set { ch_assemblies_meta_fileinput }
+        // .collect ( flat: false )
+        .set { ch_repo_meta_ufcg }
 
-    META_TO_TSV ( 
-        ch_assemblies_meta_fileinput, 
-        "tsv", 
-        "filename,label,accession,taxon_name,ncbi_name,strain_name,taxonomy",
-        "repository_metadata"
-    )
+    // META_TO_TSV ( 
+    //     ch_assemblies_meta_fileinput, 
+    //     "tsv", 
+    //     "filename,label,accession,taxon_name,ncbi_name,strain_name,taxonomy",
+    //     "repository_metadata"
+    // )
     
 
     //// combine ch_genomes_found_single and ch_genomes_found_group, removing duplicates
@@ -127,10 +126,10 @@ workflow REPOSITORY_GENOMES {
     // ch_genomes_found.count().view { "$it total genomes before deduplication" }
 
     //// format output channel as [ accession, scaffolds ]
-    ch_assemblies_meta
+    ch_repo_meta_all
         .map { accession, label, taxon_name, ncbi_name, strain_name, taxonomy, contigN50, contigL50, file_name, genome -> 
             [ accession, genome ] }
-        .tap { out_assemblies }
+        .tap { repo_assemblies }
         .map { accession, genome ->
             [ accession, "$projectDir/assets/NO_FILE1", "$projectDir/assets/NO_FILE2", "$projectDir/assets/NO_FILE3", "$projectDir/assets/NO_FILE4", genome ]
         }
@@ -144,9 +143,10 @@ workflow REPOSITORY_GENOMES {
 
     emit:
     
-    out_assemblies
+    repo_assemblies
+    meta_fileinput = ch_repo_meta_ufcg
     // assembly_report_genomes_repository = FIND_ASSEMBLIES_GROUP.out.tsv
-    metadata = META_TO_TSV.out.metadata
+    // metadata = META_TO_TSV.out.metadata
     quast_report_genomes_repository = QUAST_REPOSITORY.out.report_tsv
     quast_plot_genomes_repository = QUAST_REPOSITORY.out.nx_plot
 

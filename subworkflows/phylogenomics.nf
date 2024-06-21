@@ -20,12 +20,17 @@ workflow PHYLOGENOMICS {
 
     main:
 
-    //// define and make .ucg folder
+    //// define and make output folders
+    // for .ucg profiles
     profile_directory = file("$projectDir/output/ufcg_profiles")
     profile_directory.mkdirs()
+    // for alignments
+    alignment_directory = file("$projectDir/output/alignments")
+    alignment_directory.mkdirs()
+
 
     /// convert genomes_metadata to value channel
-    genomes_metadata = genomes_metadata.first()
+    // genomes_metadata = genomes_metadata.first()
 
     //// conditional on presence/absense of custom marker input channel
     if ( custom_markers ) {
@@ -41,15 +46,24 @@ workflow PHYLOGENOMICS {
         .collect()
         .flatten()
         .unique()
-        .set { ch_ready }
+        .set { ch_ready_profile }
 
     //// run ufcg align to align sequences from profiles
-    UFCG_ALIGN ( profile_directory, ch_ready )
+    UFCG_ALIGN ( profile_directory, ch_ready_profile, alignment_directory )
+
+    //// produce ready signal for BUILD_TREE
+    UFCG_ALIGN.out.ready_signal
+        .collect()
+        .flatten()
+        .unique()
+        .set { ch_ready_tree }
 
     //// build phylogenetic tree
-    BUILD_TREE ( UFCG_ALIGN.out.alignment_dir )
+    BUILD_TREE ( alignment_directory, ch_ready_tree )
 
     emit: 
+
+    // UFCG_ALIGN.out.ready_signal
 
     BUILD_TREE.out.trees
 

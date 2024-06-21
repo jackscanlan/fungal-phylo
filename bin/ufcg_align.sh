@@ -4,8 +4,10 @@ set -u
 ## args are the following:
 # $1 = projectDir 
 # $2 = profile_directory
-# $3 = threads
+# $3 = alignment_directory
+# $4 = threads
 
+# load shifter
 module load shifter
 
 # conditional to pull and convert Docker image or not
@@ -16,6 +18,9 @@ else
     shifterimg pull docker:endix1029/ufcg:v1.0.5
 fi
 
+# remove old alignments from output dir if present
+rm -f ${3}/*
+
 # run ufcg
 shifter \
     --image=endix1029/ufcg:v1.0.5 \
@@ -24,7 +29,10 @@ shifter \
     -i $2 \
     -o . \
     -l label,acc \
-    -t $3 \
-    -a nucleotide 
+    -t $4 \
+    -a nucleotide \
+    -f 50
 
+# copy final alignments to output dir
+cp align/* $3
 

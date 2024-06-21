@@ -37,6 +37,8 @@ Running with test data, testing basc_slurm:
 
 Testing split samplesheet:
 
+    rm -rf work/* output/*
+
     module load Java/17.0.6
     nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv 
 

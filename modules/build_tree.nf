@@ -1,10 +1,11 @@
 process BUILD_TREE {
     def module_name = "build_tree"
     tag "Whole pipeline"
-    label "high" 
+    label "very_high" 
 
     input:
-    path(alignment_dir)
+    path(alignment_directory)
+    val(ready)
 
     output:
     path("*.treefile")
@@ -24,8 +25,9 @@ process BUILD_TREE {
     ### run module code
     bash ${module_name}.sh \
         ${projectDir} \
-        ${task.cpus} \
-        ${alignment_dir}
+        ${alignment_directory} \
+        ${task.cpus}
+    
     
     """
 

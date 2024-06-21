@@ -4,10 +4,10 @@ process COMBINE_LANES {
     label "very_small"    
 
     input:
-    tuple val(sample), val(fwd_reads), val(rev_reads)
+    tuple val(sample), val(isolate), val(fwd_reads), val(rev_reads)
 
     output:   
-    tuple val(sample), path("*_R1.fastq.gz"), path("*_R2.fastq.gz"),          emit: reads
+    tuple val(sample), val(isolate), path("*_R1.fastq.gz"), path("*_R2.fastq.gz"),          emit: reads
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

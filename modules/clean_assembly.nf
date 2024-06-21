@@ -4,10 +4,10 @@ process CLEAN_ASSEMBLY {
     label "medium"
 
     input:
-    tuple val(sample), path(scaffolds)
+    tuple val(sample), val(isolate), path(scaffolds)
 
     output:
-    tuple val(sample), path("${sample}_scaffolds.clean.fasta"), emit: scaffolds
+    tuple val(sample), val(isolate), path("${sample}_scaffolds.clean.fasta"), emit: scaffolds
 
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'

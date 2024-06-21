@@ -4,10 +4,10 @@ process READ_PREPROCESSING {
     label "high" 
 
     input:
-    tuple val(sample), path(fwd_reads), path(rev_reads)
+    tuple val(sample), val(isolate), path(fwd_reads), path(rev_reads)
 
     output:   
-    tuple val(sample), path("*_unmerged_R1.fastq.gz"), path("*_unmerged_R2.fastq.gz"), path("*_merged.fastq.gz"), emit: reads
+    tuple val(sample), val(isolate), path("*_unmerged_R1.fastq.gz"), path("*_unmerged_R2.fastq.gz"), path("*_merged.fastq.gz"), emit: reads
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
 

@@ -39,17 +39,25 @@ workflow GENOME_ASSEMBLY {
 
     //// join error-corrected reads with the cleaned assembly scaffolds
     ERROR_CORRECTION.out.reads 
-        .join ( CLEAN_ASSEMBLY.out.scaffolds, by: 0 ) 
-        .set { ch_quast_new_input } // card: sample, fwd_reads, rev_reads, merged_reads, unpaired_reads, scaffolds
+        .join ( CLEAN_ASSEMBLY.out.scaffolds, by: [0,1] )  // card: sample, isolate, fwd_reads, rev_reads, merged_reads, unpaired_reads, scaffolds
+        .map { sample, isolate, fwd_reads, rev_reads, merged_reads, unpaired_reads, scaffolds ->
+            [ sample, fwd_reads, rev_reads, merged_reads, unpaired_reads, scaffolds ] }
+        .set { ch_quast_new_input }
+
 
     //// assess assembly quality
     QUAST_NEW ( ch_quast_new_input, "new" )
 
-    
+    //// format metadata
+    CLEAN_ASSEMBLY.out.scaffolds
+        .map { sample, isolate, file ->
+            // channel output format
+            [ file.getName(), sample, isolate, "unknown", "unknown", isolate, "unknown" ] }
+        .set { ch_new_meta }
     
     emit: 
-    
-    assembly_seq_genomes_new = CLEAN_ASSEMBLY.out.scaffolds
+    meta_fileinput = ch_new_meta
+    new_assemblies = CLEAN_ASSEMBLY.out.scaffolds.map { sample, isolate, scaffolds -> [ sample, scaffolds ] }
     quast_report_genomes_new = QUAST_NEW.out.report_tsv
     quast_plot_genomes_new = QUAST_NEW.out.nx_plot
 }

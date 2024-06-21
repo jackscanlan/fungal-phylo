@@ -1,14 +1,16 @@
 process UFCG_ALIGN {
     def module_name = "ufcg_align"
     tag "Whole pipeline"
-    label "medium" 
+    label "high" 
 
     input:
     path(profile_directory)
     val(ready)
+    path(alignment_directory)
 
     output:
     path("align/"), emit: alignment_dir
+    val(true), emit: ready_signal
 
 
     publishDir "${projectDir}/output/modules/${module_name}", mode: 'copy'
@@ -24,6 +26,7 @@ process UFCG_ALIGN {
     bash ${module_name}.sh \
         ${projectDir} \
         ${profile_directory} \
+        ${alignment_directory} \
         ${task.cpus}
     
     """
