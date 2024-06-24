@@ -23,10 +23,13 @@ workflow PHYLOGENOMICS {
     //// define and make output folders
     // for .ucg profiles
     profile_directory = file("$projectDir/output/ufcg_profiles")
-    profile_directory.mkdirs()
+    if ( !ch_ready_profile ) {profile_directory.deleteDir()} // delete directory and contents if UFCG_PROFILE has not already been run
+    profile_directory.mkdirs() // create new empty version
+
     // for alignments
     alignment_directory = file("$projectDir/output/alignments")
-    alignment_directory.mkdirs()
+    if ( !ch_ready_align ) {alignment_directory.deleteDir()} // delete directory and contents if UFCG_ALIGN has not already been run
+    alignment_directory.mkdirs() // create new empty version
 
 
     /// convert genomes_metadata to value channel
@@ -56,10 +59,10 @@ workflow PHYLOGENOMICS {
         .collect()
         .flatten()
         .unique()
-        .set { ch_ready_tree }
+        .set { ch_ready_align }
 
     //// build phylogenetic tree
-    BUILD_TREE ( alignment_directory, ch_ready_tree )
+    BUILD_TREE ( alignment_directory, ch_ready_align )
 
     emit: 
 

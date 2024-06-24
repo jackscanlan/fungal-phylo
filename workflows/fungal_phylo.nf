@@ -261,27 +261,27 @@ workflow FUNGAL_PHYLO {
     }
 
 
-    //// assemble new genomes 
-    if ( ch_samples_new ) { // only assemble genomes if ch_samples_new is not empty
-        GENOME_ASSEMBLY ( 
-            ch_samples_new 
-        )
+    // //// assemble new genomes 
+    // if ( ch_samples_new ) { // only assemble genomes if ch_samples_new is not empty
+    //     GENOME_ASSEMBLY ( 
+    //         ch_samples_new 
+    //     )
     
-        ch_genomes_new
-            .concat ( GENOME_ASSEMBLY.out.new_assemblies )
-            .set { ch_genomes_new }
-        ch_meta_fileinput_new
-            .concat ( GENOME_ASSEMBLY.out.meta_fileinput )
-            .set { ch_meta_fileinput_new }
+    //     ch_genomes_new
+    //         .concat ( GENOME_ASSEMBLY.out.new_assemblies )
+    //         .set { ch_genomes_new }
+    //     ch_meta_fileinput_new
+    //         .concat ( GENOME_ASSEMBLY.out.meta_fileinput )
+    //         .set { ch_meta_fileinput_new }
     
-        // //// annotate new genomes
-        // if ( ch_genomes_new ) {
-        //     GENOME_ANNOTATION (
-        //         ch_genomes_new
-        //     )
-        // }
+    //     // //// annotate new genomes
+    //     // if ( ch_genomes_new ) {
+    //     //     GENOME_ANNOTATION (
+    //     //         ch_genomes_new
+    //     //     )
+    //     // }
 
-    }
+    // }
 
     
  
@@ -306,7 +306,7 @@ workflow FUNGAL_PHYLO {
         .concat ( ch_genomes_repository )
         .set { ch_genomes_all }
 
-    
+
 
     //// combine metadata input channels
     ch_meta_fileinput

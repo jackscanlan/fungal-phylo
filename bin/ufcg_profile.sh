@@ -22,9 +22,6 @@ fi
 # convert symlink to absolute path because ufcg can't handle symlink for metadata file for some reason
 META_PATH=$(readlink ${4} -fn)
 
-# remove old profiles from output dir if present
-rm -f ${5}/*
-
 # run ufcg profile
 shifter \
     --image=endix1029/ufcg:v1.0.5 \
@@ -36,6 +33,7 @@ shifter \
     -t $6 \
     --set PRO \
     -f \
+    -w /tmp/${2} \
     --nocolor \
     -v
 

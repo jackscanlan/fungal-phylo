@@ -99,7 +99,7 @@ if [[ $3 == "true" ]]; then
         --image=rocker/tidyverse:4.4.0 \
         -- \
         Rscript --vanilla \
-        limit_external.R \
+        repository_limit.R \
         genomes_${2}.all.tsv \
         genomes_${2}.tsv \
         genomes_cull.txt

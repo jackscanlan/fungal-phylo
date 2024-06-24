@@ -2,6 +2,7 @@ process FIND_ASSEMBLIES_GROUP {
     def module_name = "find_assemblies_group"
     tag "TaxID $ncbi_taxid"
     label "small"
+    label "ncbi"
 
     input:
     val(ncbi_taxid)

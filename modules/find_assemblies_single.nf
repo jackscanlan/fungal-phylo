@@ -2,6 +2,7 @@ process FIND_ASSEMBLIES_SINGLE {
     def module_name = "find_assemblies_single"
     tag "Accession $sample"
     label "small"
+    label "ncbi"
 
     input:
     val(sample)
