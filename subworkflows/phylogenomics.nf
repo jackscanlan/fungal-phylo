@@ -20,6 +20,9 @@ workflow PHYLOGENOMICS {
 
     main:
 
+    ch_ready_profile    = Channel.empty()
+    ch_ready_align      = Channel.empty()
+
     //// define and make output folders
     // for .ucg profiles
     profile_directory = file("$projectDir/output/ufcg_profiles")
