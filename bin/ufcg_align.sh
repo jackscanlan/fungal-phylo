@@ -11,11 +11,11 @@ set -u
 module load shifter
 
 # conditional to pull and convert Docker image or not
-if shifterimg images | grep -q "endix1029/ufcg:v1.0.5"; then
+if shifterimg images | grep -q "endix1029/ufcg:v1.0.6"; then
     echo "Docker image already exists."
 else 
     # pull docker image and convert
-    shifterimg pull docker:endix1029/ufcg:v1.0.5
+    shifterimg pull docker:endix1029/ufcg:v1.0.6
 fi
 
 # remove old alignments from output dir if present
@@ -23,7 +23,7 @@ rm -f ${3}/*
 
 # run ufcg
 shifter \
-    --image=endix1029/ufcg:v1.0.5 \
+    --image=endix1029/ufcg:v1.0.6 \
     -- \
     ufcg align \
     -i $2 \

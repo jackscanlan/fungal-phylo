@@ -54,6 +54,9 @@ Testing split samplesheet:
     # Clavicipitaceae
     nextflow run . -profile basc_slurm -resume --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 34397 
 
+    # test with small samples
+    nextflow run . -profile basc_slurm,test --samplesheet input/samplesheet_split_test.csv --ncbi_taxid 5530
+
 Testing datasets and jq:
 
     mkdir -p ~/jq_test && cd ~/jq_test
