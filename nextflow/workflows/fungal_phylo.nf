@@ -10,45 +10,6 @@ TODO:
 
 
 
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    PRINT PARAMS SUMMARY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-// include functions from nf-schema
-include { validateParameters; paramsHelp; paramsSummaryLog; samplesheetToList } from 'plugin/nf-schema' 
-
-// Print help message, supply typical command line usage for the pipeline
-if (params.help) {
-   log.info paramsHelp("nextflow run . --samplesheet samplesheet.csv") // TODO: add typical commands for pipeline
-   exit 0
-}
-
-// Validate input parameters using schema
-// validateParameters( parameters_schema: 'nextflow_schema.json' )
-
-// Print summary of supplied parameters (that differ from defaults)
-// log.info paramsSummaryLog(workflow)
-
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    INPUT AND VARIABLES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-/* Inputs and parameters
-    Per sample/genome:
-        - .fastq input reads (more than one pair)
-            - OR accession in repository like NCBI
-        - metadata for every genome (required: name, )
-    Per pipeline run:
-        - Taxonomic group to restrict phylogeny to
-        - .fasta files or pHMM of multilocus regions to extract
-        - 
-
-*/
 
 //// make genome folder
 genome_directory = file("$projectDir/output/genomes").mkdirs()

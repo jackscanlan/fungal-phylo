@@ -37,6 +37,8 @@ Running with test data, testing basc_slurm:
 
 Testing split samplesheet:
 
+    export NXF_VER=23.05.0-edge
+
     rm -rf work/* output/*
 
     module load Java/17.0.6
