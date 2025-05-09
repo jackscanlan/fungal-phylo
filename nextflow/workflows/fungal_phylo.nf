@@ -93,19 +93,6 @@ include { CHANNEL_TO_FILE as META_TO_TSV                                } from '
 
 
 
-include { FIND_ASSEMBLIES_GROUP                                     } from '../modules/find_assemblies_group'
-include { FIND_ASSEMBLIES_SINGLE                                    } from '../modules/find_assemblies_single'
-include { COMBINE_LANES                             } from '../modules/combine_lanes'
-include { READ_PREPROCESSING                        } from '../modules/read_preprocessing'
-include { ERROR_CORRECTION                          } from '../modules/error_correction'
-include { ASSEMBLY                                  } from '../modules/assembly'
-include { CLEAN_ASSEMBLY                                  } from '../modules/clean_assembly'
-include { QUAST                                     } from '../modules/quast'
-include { UFCG_PROFILE                                     } from '../modules/ufcg_profile'
-include { UFCG_ALIGN                                     } from '../modules/ufcg_align'
-
-
-
 // utility processes for development and debugging
 include { STOP                                      } from '../modules/stop'
 
