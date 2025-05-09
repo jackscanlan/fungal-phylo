@@ -13,7 +13,7 @@ set -u
 # $9 = genome_type
 
 
-module load QUAST/5.0.2-foss-2018b-Python-2.7.15
+module load QUAST/5.3.0-gfbf-2024a
 
 ## conditional if genome_type is "new" or "old"
 # if assembly is new and therefore has reads associated

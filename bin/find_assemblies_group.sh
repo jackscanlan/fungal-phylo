@@ -31,6 +31,8 @@ shifter \
     --include genome \
     --assembly-source GenBank
 
+module load UnZip/6.0-GCCcore-13.3.0
+
 # unzip 
 unzip genomes_${2}.zip -d genomes_${2}
 rm genomes_${2}.zip
@@ -86,6 +88,9 @@ echo -e "$HEADER" | cat - genomes_${2}_body.tsv > genomes_${2}.all.tsv
 ### TODO: if $3 (limit_external) is true, pare genomes down to one per 'Taxid' value
 if [[ $3 == "true" ]]; then
     
+    echo "This isn't finished yet, sorry!"
+    exit 1
+
     # conditional to pull and convert Docker image or not
     if shifterimg images | grep -q "rocker/tidyverse:4.4.0"; then
         echo "rocker/tidyverse Docker image already exists."

@@ -33,6 +33,8 @@ shifter \
     --include genome \
     --assembly-source GenBank
 
+module load UnZip/6.0-GCCcore-13.3.0
+
 # unzip 
 unzip genome_${SAMPLE}.zip -d genome_${SAMPLE}
 rm genome_${SAMPLE}.zip

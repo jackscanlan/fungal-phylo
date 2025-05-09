@@ -11,7 +11,7 @@ set -u
 # $7 = 
 # $8 = 
 
-module load BBMap/38.98-GCC-11.2.0
+module load BBMap/39.17-GCC-13.3.0
 
 # # repair reads that might be broken
 # repair.sh \

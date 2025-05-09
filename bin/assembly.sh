@@ -10,7 +10,7 @@ set -u
 # $6 = unpaired_reads (one path)
 # $7 = threads
 
-module load SPAdes/3.15.5-GCC-12.3.0
+module load SPAdes/4.0.0-GCC-13.3.0
 
 ## only use merged and/or unpaired reads if they exist
 # if merged and unpaired is empty

@@ -11,7 +11,7 @@ set -u
 # $7 = 
 # $8 = 
 
-module load SPAdes/3.15.5-GCC-12.3.0
+module load SPAdes/4.0.0-GCC-13.3.0
 
 ## only use merged reads if they exist
 if [[ -z $(grep '[^[:space:]]' $5) ]]; then
